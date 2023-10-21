@@ -1076,32 +1076,32 @@ void EncModeCtrlMTnoRQT::initCTUEncoding( const Slice &slice )
 
 void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStructure& cs )
 {
-  // ¸Ãº¯ÊýÖ÷ÒªÍê³É±àÂë¶ËRD costµÄÄ£Ê½É¸Ñ¡£¬²¢¼ÓÈë¸÷ÖÖ»®·ÖÄ£Ê½ºÍinter intraÄ£Ê½µÈÖÁRDOÁÐ±í
-  // È·¶¨ËÑË÷µÄ×îÐ¡¡¢×î´óÉî¶È
-  // ËÑË÷µÄ×îÐ¡Éî¶ÈÎª0
+  // 该函数主要完成编码端RD cost的模式筛选，并加入各种划分模式和inter intra模式等至RDO列表
+  // 确定搜索的最小、最大深度
+  // 搜索的最小深度为0
   unsigned minDepth = 0;
-  // ×î´óËÑË÷Éî¶È = log(CTU_Size / minQTSize), by default log(128 / 4) = 5
+  // 最大搜索深度 = log(CTU_Size / minQTSize), by default log(128 / 4) = 5
   unsigned maxDepth = floorLog2(cs.sps->getCTUSize()) - floorLog2(cs.sps->getMinQTSize( m_slice->getSliceType(), partitioner.chType ));
-  // Èç¹û¿ªÆôLarge CTU£¬»á¸ù¾ÝÖÜÎ§¿éµÄÉî¶È½øÐÐµ÷Õû
+  // 如果开启Large CTU，会根据周围块的深度进行调整
   if( m_pcEncCfg->getUseFastLCTU() )
   {
     if( auto adPartitioner = dynamic_cast<AdaptiveDepthPartitioner*>( &partitioner ) )
     {
-      // ¸ù¾ÝÉÏ¡¢×ó¡¢×óÉÏ¡¢ÓÒÉÏÏàÁÚCUÉî¶ÈÐÅÏ¢ÉèÖÃ×îÐ¡×î´óÉî¶È
+      // 根据上、左、左上、右上相邻CU深度信息设置最小最大深度
       adPartitioner->setMaxMinDepth( minDepth, maxDepth, cs );
     }
   }
 
-  // ÉèÖÃ×î´ó¡¢×îÐ¡Éî¶È
+  // 设置最大、最小深度
   m_ComprCUCtxList.push_back( ComprCUCtx( cs, minDepth, maxDepth, NUM_EXTRA_FEATURES ) );
-  // µ±Ç°CUµÄ×ó²àCU
+  // 当前CU的左侧CU
   const CodingUnit* cuLeft  = cs.getCU( cs.area.blocks[partitioner.chType].pos().offset( -1, 0 ), partitioner.chType );
-  // µ±Ç°CUµÄÉÏ·½CU
+  // 当前CU的上方CU
   const CodingUnit* cuAbove = cs.getCU( cs.area.blocks[partitioner.chType].pos().offset( 0, -1 ), partitioner.chType );
 
-  // ¸ù¾Ý×óÉÏCUµÄ´æÔÚÇé¿öÒÔ¼°QT»®·ÖÉî¶ÈÇé¿ö¾ö¶¨QTÊÇ·ñÏÈÓÚBT»®·Ö
-  // Èç¹û×óÓëÉÏÖÁÉÙÒ»¸ö´æÔÚ£¬²¢ÇÒÉî¶È´óÓÚµ±Ç°cuÉî¶ÈÔòqtBeforeBt, Ä¬ÈÏÊÇnon-split, BTH, BTV, TTH, QT
-  // Èô¶¼²»´æÔÚ£¬Width >= 32 * 2^depth and Width > minQTSize * 2, Ò²½«QTÌáÇ°µ½BTÖ®Ç°
+  // 根据左上CU的存在情况以及QT划分深度情况决定QT是否先于BT划分
+  // 如果左与上至少一个存在，并且深度大于当前cu深度则qtBeforeBt, 默认是non-split, BTH, BTV, TTH, QT
+  // 若都不存在，Width >= 32 * 2^depth and Width > minQTSize * 2, 也将QT提前到BT之前
   const bool qtBeforeBt = ( (  cuLeft  &&  cuAbove  && cuLeft ->qtDepth > partitioner.currQtDepth && cuAbove->qtDepth > partitioner.currQtDepth )
                          || (  cuLeft  && !cuAbove  && cuLeft ->qtDepth > partitioner.currQtDepth )
                          || ( !cuLeft  &&  cuAbove  && cuAbove->qtDepth > partitioner.currQtDepth )
@@ -1109,11 +1109,11 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
                          && ( cs.area.lwidth() > ( cs.pcv->getMinQtSize( *cs.slice, partitioner.chType ) << 1 ) );
 
 
-  // ÉèÖÃ³õÊ¼²ÎÊý
-  // ÓÃÀ´´æ´¢ctuÖÐµÄÒ»¸öcuÔÚcompress¹ý³ÌÖÐµÄ¸÷ÖÖÊý¾Ý
+  // 设置初始参数
+  // 用来存储ctu中的一个cu在compress过程中的各种数据
   ComprCUCtx &cuECtx  = m_ComprCUCtxList.back();
 
-  // ´æ´¢¸÷ÖÖÄ£Ê½µÄ´ú¼Û
+  // 存储各种模式的代价
   cuECtx.set( BEST_NON_SPLIT_COST,  MAX_DOUBLE );
   cuECtx.set( BEST_VERT_SPLIT_COST, MAX_DOUBLE );
   cuECtx.set( BEST_HORZ_SPLIT_COST, MAX_DOUBLE );
@@ -1128,19 +1128,19 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
   cuECtx.set( IS_BEST_NOSPLIT_SKIP, false );
   cuECtx.set( MAX_QT_SUB_DEPTH,     0 );
   
-  // baseQP Îª slice ¼¶µÄ QP
+  // baseQP 为 slice 级的 QP
   int baseQP = cs.baseQP;
-  // µ±Ç°»®·ÖÊ÷²»ÊÇseparate tree£¨·ÖÀëÊ÷£©ÊÇ joint tree£¨ÁªºÏÊ÷£©»òµ±Ç°ÎªÁÁ¶È·ÖÁ¿
+  // 当前划分树不是separate tree（分离树）是 joint tree（联合树）或当前为亮度分量
   if (!partitioner.isSepTree(cs) || isLuma(partitioner.chType))
   {
-    // Ê¹ÓÃ adaptive QP
+    // 使用 adaptive QP
     if (m_pcEncCfg->getUseAdaptiveQP())
     {
-      // baseQP È¡ -(6 * (m_bitDepth[CHANNEL_TYPE_LUMA] - 8) ºÍ 63 ºÍ sliceQP + delta ÖÐµÄÖÐÖµ
+      // baseQP 取 -(6 * (m_bitDepth[CHANNEL_TYPE_LUMA] - 8) 和 63 和 sliceQP + delta 中的中值
       baseQP = Clip3(-cs.sps->getQpBDOffset(CHANNEL_TYPE_LUMA), MAX_QP, baseQP + xComputeDQP(cs, partitioner));
     }
 #if ENABLE_QPA_SUB_CTU
-    // ×ÔÊÊÓ¦»ñµÃ baseQP µÄÒ»ÖÖ·½Ê½
+    // 自适应获得 baseQP 的一种方式
     else if (m_pcEncCfg->getUsePerceptQPA() && !m_pcEncCfg->getUseRateCtrl() && cs.pps->getUseDQP() && cs.slice->getCuQpDeltaSubdiv() > 0)
     {
       const PreCalcValues &pcv = *cs.pcv;
@@ -1156,7 +1156,7 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
     }
 #endif
 #if SHARP_LUMA_DELTA_QP
-    // ÁíÒ»ÖÖ»ñµÃ delta QP µÄ»úÖÆ
+    // 另一种获得 delta QP 的机制
     if (m_pcEncCfg->getLumaLevelToDeltaQPMapping().isEnabled())
     {
       if (partitioner.currQgEnable())
@@ -1202,15 +1202,15 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
     }
   }
 
- // ÒÔÏÂÊÇÔÚbase QP¸½½üÉè¶¨minQPºÍmaxQP£¬ÔÙRD ²âÊÔÁ½ÕßÖ®¼äµÄËùÓÐÈ¡Öµ£¬È·¶¨×î¼ÑµÄminQPºÍmaxQP
+ // 以下是在base QP附近设定minQP和maxQP，再RD 测试两者之间的所有取值，确定最佳的minQP和maxQP
   int minQP = baseQP;
   int maxQP = baseQP;
 
-  //È·¶¨ minQP Óë maxQP
+  //确定 minQP 与 maxQP
   xGetMinMaxQP( minQP, maxQP, cs, partitioner, baseQP, *cs.sps, *cs.pps, CU_QUAD_SPLIT );
   bool checkIbc = true;
 
-   // É«¶È·ÖÁ¿²»¼ì²éIBCÄ£Ê½
+   // 色度分量不检查IBC模式
   if (partitioner.chType == CHANNEL_TYPE_CHROMA)
   {
     checkIbc = false;
@@ -1219,11 +1219,11 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
   // NOTE: Working back to front, as a stack, which is more efficient with the container
   // NOTE: First added modes will be processed at the end.
   // Add unit split modes
-  // ¶ÑÕ»ÐÎÊ½£¬´ÓºóÍùÇ°£¬Ð§ÂÊ¸ü¸ß£¬ÏÈÌí¼ÓµÄÄ£Ê½ºó´¦Àí
-  // Ìí¼Ó»®·ÖÄ£Ê½½øÈë²âÊÔÁÐ±í
+  // 堆栈形式，从后往前，效率更高，先添加的模式后处理
+  // 添加划分模式进入测试列表
 
-  // QT²»ÔçÓÚBT£¬Ò²¾ÍÊÇBTÏÈ´¦Àí£¬Ôò¼ÓÈë QT ËÄ²æÊ÷»®·Ö£¬ÏÈ¼ÓÈëµÄºó´¦Àí
-  if( !cuECtx.get<bool>( QT_BEFORE_BT ) ) // ±éÀú¿ÉÄÜµÄQP²ÎÊý
+  // QT不早于BT，也就是BT先处理，则加入 QT 四叉树划分，先加入的后处理
+  if( !cuECtx.get<bool>( QT_BEFORE_BT ) ) // 遍历可能的QP参数
   {
     for( int qp = maxQP; qp >= minQP; qp-- )
     {
@@ -1231,8 +1231,8 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
     }
   }
 
-  // cansplitÀï±ß¸ù¾ÝCUµÄ³ß´ç½øÐÐÊÇ·ñ»®·ÖµÄÅÐ¶Ï¡£¿ìËÙËã·¨¾ÍÊÇÔÚÕâÀï½øÐÐÐÞ¸ÄµÄ
-  // Èý²æÊ÷´¹Ö±»®·Ö£¬QP´Ó´óµ½Ð¡±éÀú£¬¼ÓÈë½øÐÐ¶ÑÕ»
+  // cansplit里边根据CU的尺寸进行是否划分的判断。快速算法就是在这里进行修改的
+  // 三叉树垂直划分，QP从大到小遍历，加入进行堆栈
   if( partitioner.canSplit( CU_TRIV_SPLIT, cs ) )
   {
     // add split modes
@@ -1242,7 +1242,7 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
     }
   }
 
-  // Èý²æÊ÷Ë®Æ½»®·Ö
+  // 三叉树水平划分
   if( partitioner.canSplit( CU_TRIH_SPLIT, cs ) )
   {
     // add split modes
@@ -1255,7 +1255,7 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
   int minQPq = minQP;
   int maxQPq = maxQP;
   xGetMinMaxQP( minQP, maxQP, cs, partitioner, baseQP, *cs.sps, *cs.pps, CU_BT_SPLIT );
-  // ¶þ²æÊ÷´¹Ö±»®·Ö
+  // 二叉树垂直划分
   if( partitioner.canSplit( CU_VERT_SPLIT, cs ) )
   {
     // add split modes
@@ -1269,7 +1269,7 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
   {
     m_ComprCUCtxList.back().set( DID_VERT_SPLIT, false );
   }
-  // ¶þ²æÊ÷Ë®Æ½»®·Ö
+  // 二叉树水平划分
   if( partitioner.canSplit( CU_HORZ_SPLIT, cs ) )
   {
     // add split modes
@@ -1284,7 +1284,7 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
     m_ComprCUCtxList.back().set( DID_HORZ_SPLIT, false );
   }
 
-  // QTÓÅÏÈÓÚBT»®·Ö£¬¾Í×îºó¼Ó½øÈ¥QT»®·Ö£¬Ò²¾ÍÊÇÏÈ´¦Àí
+  // QT优先于BT划分，就最后加进去QT划分，也就是先处理
   if( cuECtx.get<bool>( QT_BEFORE_BT ) )
   {
     for( int qp = maxQPq; qp >= minQPq; qp-- )
@@ -1293,36 +1293,36 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
     }
   }
 
-  // ÕâÀï¼ÓÈëÁËÒ»¸öDONT_SPLITµÄ±êÖ¾Î»
+  // 这里加入了一个DONT_SPLIT的标志位
   m_ComprCUCtxList.back().testModes.push_back( { ETM_POST_DONT_SPLIT } );
   
-  // ÉèÖÃ²»»®·ÖµÄQP£¬¼´µ±Ç°¿éµÄintra inter IBCµÈÄ£Ê½ÐèÒªtestµÄQP range
+  // 设置不划分的QP，即当前块的intra inter IBC等模式需要test的QP range
   xGetMinMaxQP( minQP, maxQP, cs, partitioner, baseQP, *cs.sps, *cs.pps, CU_DONT_SPLIT );
 
   int  lowestQP = minQP;
 
   //////////////////////////////////////////////////////////////////////////
   // Add unit coding modes: Intra, InterME, InterMerge ...
-  // ¼ÓÈë¿é±àÂëÄ£Ê½£¬Ö¡ÄÚ¡¢Ö¡¼ä¡¢IBCµÄRDOÄ¬ÈÏÎªtrue
-  // tryIntraRdo ºÍ tryInterRdo ±äÁ¿µÄÈ·¶¨È¡¾öÓÚ partitioner.modeType µÄÈ¡Öµ£¬ÔÚÕâÀï¸ù¾Ý
-  // partitioner.modeTypeÅÐ¶ÏÊÇ·ñÖ¡ÄÚ»òÕßÖ¡¼äµÄRDO
-  // ¶ø partitioner.modeType µÄÈ¡ÖµÊÜsignalModeConsVal È¡ÖµÔ¼Êø£¬ÔÚxCompressCuº¯ÊýÖÐ
-  // µ÷ÓÃsignalModeConsº¯Êý½øÐÐÅÐ¶Ï
+  // 加入块编码模式，帧内、帧间、IBC的RDO默认为true
+  // tryIntraRdo 和 tryInterRdo 变量的确定取决于 partitioner.modeType 的取值，在这里根据
+  // partitioner.modeType判断是否帧内或者帧间的RDO
+  // 而 partitioner.modeType 的取值受signalModeConsVal 取值约束，在xCompressCu函数中
+  // 调用signalModeCons函数进行判断
 
   bool tryIntraRdo = true;
   bool tryInterRdo = true;
   bool tryIBCRdo   = true;
-  // ÈôÖ¸¶¨ isConsIntra£¬Ôò²»³¢ÊÔ Inter RDO
+  // 若指定 isConsIntra，则不尝试 Inter RDO
   if( partitioner.isConsIntra() )
   {
     tryInterRdo = false;
   }
-  // ÈôÖ¸¶¨ isConsInter£¬Ôò²»³¢ÊÔ IBCºÍintra RDO
+  // 若指定 isConsInter，则不尝试 IBC和intra RDO
   else if( partitioner.isConsInter() )
   {
     tryIntraRdo = tryIBCRdo = false;
   }
-  // Èô²»³¢ÊÔ IBC RDO£¬Ôò²»¼ì²é IBC
+  // 若不尝试 IBC RDO，则不检查 IBC
   checkIbc &= tryIBCRdo;
 
   for( int qpLoop = maxQP; qpLoop >= minQP; qpLoop-- )
@@ -1331,7 +1331,7 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
 #if REUSE_CU_RESULTS
     const bool isReusingCu = isValid( cs, partitioner, qp );
     cuECtx.set( IS_REUSING_CU, isReusingCu );
-    // Ñ­»·½« ETM_RECO_CACHED ¼ÓÈë RDO
+    // 循环将 ETM_RECO_CACHED 加入 RDO
     if( isReusingCu )
     {
       m_ComprCUCtxList.back().testModes.push_back( {ETM_RECO_CACHED, ETO_STANDARD, qp} );
@@ -1340,8 +1340,8 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
     // add intra modes
     if( tryIntraRdo )
     {
-      //¼ÓÈëPLT
-      // 4*4µÄÖ¡ÄÚÉ«¶È¿é£¨PLT Intra£©  ÆäËû¿é£ºIntra PLT
+      //加入PLT
+      // 4*4的帧内色度块（PLT Intra）  其他块：Intra PLT
       if (cs.slice->getSPS()->getPLTMode() && (partitioner.treeType != TREE_D || cs.slice->isIntra() || (cs.area.lwidth() == 4 && cs.area.lheight() == 4)) && getPltEnc())
       {
         m_ComprCUCtxList.back().testModes.push_back({ ETM_PALETTE, ETO_STANDARD, qp });
@@ -1353,7 +1353,7 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
       }
     }
 
-    // add ibc mode to intra path ¼ÓÈëIBCÄ£Ê½
+    // add ibc mode to intra path 加入IBC模式
     if (cs.sps->getIBCFlag() && checkIbc)
     {
       m_ComprCUCtxList.back().testModes.push_back({ ETM_IBC,         ETO_STANDARD,  qp });
@@ -1365,19 +1365,19 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
   }
 
   // add first pass modes
-  // ·ÇÖ¡ÄÚÄ£Ê½µÄÊ±ºò²Å½øÐÐÖ¡¼ä ´óÐ¡²»Îª4¡Á4 Ê¹ÓÃÖ¡¼ä
+  // 非帧内模式的时候才进行帧间 大小不为4×4 使用帧间
   if ( !m_slice->isIntra() && !( cs.area.lwidth() == 4 && cs.area.lheight() == 4 ) && tryInterRdo )
   {
     
     for( int qpLoop = maxQP; qpLoop >= minQP; qpLoop-- )
     {
       const int  qp       = std::max( qpLoop, lowestQP );
-      // Ö¡¼äÔË¶¯¹À¼Æ£¿£¿
+      // 帧间运动估计？？
       if (m_pcEncCfg->getIMV())
       {
         m_ComprCUCtxList.back().testModes.push_back({ ETM_INTER_ME,  EncTestModeOpts( 4 << ETO_IMV_SHIFT ), qp });
       }
-      // ×ÔÊÊÓ¦ÏñËØ¾«¶È
+      // 自适应像素精度
       if( m_pcEncCfg->getIMV() || m_pcEncCfg->getUseAffineAmvr() )
       {
         int imv = m_pcEncCfg->getIMV4PelFast() ? 3 : 2;
@@ -1385,7 +1385,7 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
         m_ComprCUCtxList.back().testModes.push_back( { ETM_INTER_ME, EncTestModeOpts( 1 << ETO_IMV_SHIFT ), qp } );
       }
 
-      // Ê¹ÓÃÒ»Ð©¿ìËÙËã·¨µÄ»°£¬¼ÓÈë¶ÔÓ¦µÄÖ¡¼äÄ£Ê½
+      // 使用一些快速算法的话，加入对应的帧间模式
       if( m_pcEncCfg->getUseEarlySkipDetection() )
       {
         //GEO 
@@ -1393,28 +1393,28 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
         {
           m_ComprCUCtxList.back().testModes.push_back( { ETM_MERGE_GEO, ETO_STANDARD, qp } );
         }
-        // ³£¹æMergeÄ£Ê½ºÍSkipÄ£Ê½
+        // 常规Merge模式和Skip模式
         m_ComprCUCtxList.back().testModes.push_back( { ETM_MERGE_SKIP,  ETO_STANDARD, qp } );
-        // ¼ÓÈëaffine mergeÄ£Ê½
+        // 加入affine merge模式
         if (cs.sps->getUseAffine() || (cs.sps->getSbTMVPEnabledFlag() && cs.slice->getPicHeader()->getEnableTMVPFlag()))
         {
           m_ComprCUCtxList.back().testModes.push_back( { ETM_AFFINE,    ETO_STANDARD, qp } );
         }
-        // Ö¡¼äAMVP£¬³£¹æAMVPÄ£Ê½»òÕßAffine AMVPÄ£Ê½
+        // 帧间AMVP，常规AMVP模式或者Affine AMVP模式
         m_ComprCUCtxList.back().testModes.push_back( { ETM_INTER_ME,    ETO_STANDARD, qp } );
       }
-      else // ²»Ê¹ÓÃ¿ìËÙËã·¨
+      else // 不使用快速算法
       {
-        // Ö¡¼äAMVP£¬³£¹æAMVPÄ£Ê½»òÕßAffine AMVPÄ£Ê½
+        // 帧间AMVP，常规AMVP模式或者Affine AMVP模式
         m_ComprCUCtxList.back().testModes.push_back( { ETM_INTER_ME,    ETO_STANDARD, qp } );
         // GEO 
         if( cs.sps->getUseGeo() && cs.slice->isInterB() )
         {
           m_ComprCUCtxList.back().testModes.push_back( { ETM_MERGE_GEO, ETO_STANDARD, qp } );
         }
-        // ³£¹æMergeÄ£Ê½ºÍSkipÄ£Ê½
+        // 常规Merge模式和Skip模式
         m_ComprCUCtxList.back().testModes.push_back( { ETM_MERGE_SKIP,  ETO_STANDARD, qp } );
-        // ¼ÓÈëaffine mergeÄ£Ê½
+        // 加入affine merge模式
         if (cs.sps->getUseAffine() || (cs.sps->getSbTMVPEnabledFlag() && cs.slice->getPicHeader()->getEnableTMVPFlag()))
         {
           m_ComprCUCtxList.back().testModes.push_back( { ETM_AFFINE,    ETO_STANDARD, qp } );
@@ -1433,8 +1433,8 @@ void EncModeCtrlMTnoRQT::initCULevel( Partitioner &partitioner, const CodingStru
   }
 
   // ensure to skip unprobable modes
-  // ÅÐ¶Ïµ±Ç°m_ComprCUCtxListÕ»¶¥ÖÐµÄÄ£Ê½ÊÇ·ñÒªÌø¹ýµÄ£¬ÎªÕæµÄ»°£¬ÔòÔËÐÐnextmod()º¯Êý£¬Ìø¹ý
-  //Èç¹ûµÚÒ»¸ö²»¿ÉÒÔ ÄÇÃ´ÔÚnextModeº¯ÊýÄÚµ¯³ö ²¢¼ì²éÏÂÃæµÄÄ£Ê½
+  // 判断当前m_ComprCUCtxList栈顶中的模式是否要跳过的，为真的话，则运行nextmod()函数，跳过
+  //如果第一个不可以 那么在nextMode函数内弹出 并检查下面的模式
   if( !tryModeMaster( m_ComprCUCtxList.back().testModes.back(), cs, partitioner ) )
   {
     nextMode( cs, partitioner );
@@ -1451,7 +1451,7 @@ void EncModeCtrlMTnoRQT::finishCULevel( Partitioner &partitioner )
 
 bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingStructure &cs, Partitioner& partitioner )
 {
-  // ÓÃÀ´´æ´¢ctuÖÐµÄÒ»¸öcuÔÚcompress¹ý³ÌÖÐµÄ¸÷ÖÖÊý¾Ý
+  // 用来存储ctu中的一个cu在compress过程中的各种数据
   ComprCUCtx& cuECtx = m_ComprCUCtxList.back();
 
   // Fast checks, partitioning depended
@@ -1472,7 +1472,7 @@ bool EncModeCtrlMTnoRQT::tryMode( const EncTestMode& encTestmode, const CodingSt
   {
     return false;
   }
-  //¼ì²âÈßÓàµÄ»®·ÖÇé¿ö £¬±ÈÈçËµBTVºóÁ½Õß¶¼ÔÙBTH ÕâÑùºÍQTÖØ¸´
+  //检测冗余的划分情况 ，比如说BTV后两者都再BTH 这样和QT重复
   const PartSplit implicitSplit = partitioner.getImplicitSplit( cs );
   const bool isBoundary         = implicitSplit != CU_DONT_SPLIT;
 
@@ -2151,4 +2151,3 @@ bool EncModeCtrlMTnoRQT::useModeResult( const EncTestMode& encTestmode, CodingSt
     return false;
   }
 }
-

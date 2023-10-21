@@ -236,7 +236,7 @@ int main(int argc, char* argv[])
         try
         {
 #endif
-          keepLoop = encApp->encodePrep( eos );//��ȡYUV����ʼ��lib
+          keepLoop = encApp->encodePrep( eos );//获取YUV，初始化lib
 #ifndef _DEBUG
         }
         catch( Exception &e )
@@ -254,6 +254,7 @@ int main(int argc, char* argv[])
     }
 
     // encode GOP
+    //正式开始编码
     keepLoop = true;
     while( keepLoop )
     {
@@ -263,7 +264,7 @@ int main(int argc, char* argv[])
         try
         {
 #endif
-          keepLoop = encApp->encode();//��ں���?? 
+          keepLoop = encApp->encode();//入口函数 
 #ifndef _DEBUG
         }
         catch( Exception &e )
