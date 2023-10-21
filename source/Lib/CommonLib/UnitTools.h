@@ -221,13 +221,13 @@ uint32_t updateCandList(T mode, double uiCost, static_vector<T, N> &candModeList
   size_t shift = 0;
   size_t currSize = std::min( uiFastCandNum, candCostList.size() );
 
-  // ÕÒµ½²åÈëµ±Ç°cost¡¢modeÒªÒÆ¶¯µÄ²½Êı 
+  // æ‰¾åˆ°æ’å…¥å½“å‰costã€modeè¦ç§»åŠ¨çš„æ­¥æ•° 
   while( shift < uiFastCandNum && shift < currSize && uiCost < candCostList[currSize - 1 - shift] )
   {
     shift++;
   }
 
-  // ´Ó´ı²åÈëÎ»ÖÃ¿ªÊ¼Í³Ò»ÍùºóÒÆÒ»Î»£¬¸ø´ı²åÈëµÄcostºÍmode¿Õ³öÎ»ÖÃ
+  // ä»å¾…æ’å…¥ä½ç½®å¼€å§‹ç»Ÿä¸€å¾€åç§»ä¸€ä½ï¼Œç»™å¾…æ’å…¥çš„costå’Œmodeç©ºå‡ºä½ç½®
   if( candModeList.size() >= uiFastCandNum && shift != 0 )
   {
     for( i = 1; i < shift; i++ )
@@ -235,16 +235,16 @@ uint32_t updateCandList(T mode, double uiCost, static_vector<T, N> &candModeList
       candModeList[currSize - i] = candModeList[currSize - 1 - i];
       candCostList[currSize - i] = candCostList[currSize - 1 - i];
     }
-    // ²åÈëµ±Ç°costºÍmode
+    // æ’å…¥å½“å‰costå’Œmode
     candModeList[currSize - shift] = mode;
     candCostList[currSize - shift] = uiCost;
     if (iserttPos != nullptr)
     {
-      *iserttPos = int(currSize - shift); //²åÈëµÄÎ»ÖÃ·µ»Ø¸øiserrPos
+      *iserttPos = int(currSize - shift); //æ’å…¥çš„ä½ç½®è¿”å›ç»™iserrPos
     }
     return 1;
   }
-  else if( currSize < uiFastCandNum )//ÈôÁĞ±í³¤¶È²»×ã£¬Ö±½ÓÀ©³äcost£¬modeÁĞ±í(mergeÎª6)
+  else if( currSize < uiFastCandNum )//è‹¥åˆ—è¡¨é•¿åº¦ä¸è¶³ï¼Œç›´æ¥æ‰©å……costï¼Œmodeåˆ—è¡¨(mergeä¸º6)
   {
     candModeList.insert(candModeList.end() - shift, mode);
     candCostList.insert( candCostList.end() - shift, uiCost );
@@ -256,7 +256,7 @@ uint32_t updateCandList(T mode, double uiCost, static_vector<T, N> &candModeList
   }
   if (iserttPos != nullptr)
   {
-    *iserttPos = -1;//µ±Ç°cost±ÈcostÁĞ±íÖĞËùÓĞÖµ¶¼´ó£¬²»¸üĞÂcostÁĞ±í£¬·µ»Ø-1
+    *iserttPos = -1;//å½“å‰costæ¯”coståˆ—è¡¨ä¸­æ‰€æœ‰å€¼éƒ½å¤§ï¼Œä¸æ›´æ–°coståˆ—è¡¨ï¼Œè¿”å›-1
   }
   return 0;
 }

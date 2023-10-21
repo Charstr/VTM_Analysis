@@ -878,7 +878,7 @@ void HLSyntaxReader::parsePPS( PPS* pcPPS )
   xReadRbspTrailingBits();
 }
 
-void HLSyntaxReader::parseAPS( APS* aps )//½âÎöÁÁ¶È·ÖÁ¿ºÍÉ«¶È·ÖÁ¿µÄALF Flag¡¢ÂË²¨Æ÷¸öÊıÒÔ¼°Ã¿¸öclass¶ÔÓ¦µÄFilterIdx
+void HLSyntaxReader::parseAPS( APS* aps )//è§£æäº®åº¦åˆ†é‡å’Œè‰²åº¦åˆ†é‡çš„ALF Flagã€æ»¤æ³¢å™¨ä¸ªæ•°ä»¥åŠæ¯ä¸ªclasså¯¹åº”çš„FilterIdx
 {
 #if ENABLE_TRACING
   xTraceAPSHeader();
@@ -922,14 +922,14 @@ void HLSyntaxReader::parseAPS( APS* aps )//½âÎöÁÁ¶È·ÖÁ¿ºÍÉ«¶È·ÖÁ¿µÄALF Flag¡¢ÂË²
 void HLSyntaxReader::parseAlfAps( APS* aps )
 {
   uint32_t  code;
-  //»ñÈ¡ALFÏà¹ØµÄ²ÎÊı
+  //è·å–ALFç›¸å…³çš„å‚æ•°
   AlfParam param = aps->getAlfAPSParam();
   param.reset();
-  param.enabledFlag[COMPONENT_Y] = param.enabledFlag[COMPONENT_Cb] = param.enabledFlag[COMPONENT_Cr] = true;//¸÷¸ö·ÖÁ¿ÊÇ·ñALFµÄ±êÖ¾
-  //½âÎöÁÁ¶ÈFLAG
+  param.enabledFlag[COMPONENT_Y] = param.enabledFlag[COMPONENT_Cb] = param.enabledFlag[COMPONENT_Cr] = true;//å„ä¸ªåˆ†é‡æ˜¯å¦ALFçš„æ ‡å¿—
+  //è§£æäº®åº¦FLAG
   READ_FLAG(code, "alf_luma_new_filter");
   param.newFilterFlag[CHANNEL_TYPE_LUMA] = code;
-  //½âÎöÉ«¶Èflag
+  //è§£æè‰²åº¦flag
   if (aps->chromaPresentFlag)
   {
     READ_FLAG(code, "alf_chroma_new_filter");
@@ -939,8 +939,8 @@ void HLSyntaxReader::parseAlfAps( APS* aps )
   {
     param.newFilterFlag[CHANNEL_TYPE_CHROMA] = 0;
   }
-  //½âÎöÂË²¨Æ÷²ÎÊı
-  //CCALFµÄ²ÎÊı
+  //è§£ææ»¤æ³¢å™¨å‚æ•°
+  //CCALFçš„å‚æ•°
   CcAlfFilterParam ccAlfParam = aps->getCcAlfAPSParam();
   if (aps->chromaPresentFlag)
   {
@@ -964,7 +964,7 @@ void HLSyntaxReader::parseAlfAps( APS* aps )
           && ccAlfParam.newCcAlfFilter[COMPONENT_Cb - 1] == 0 && ccAlfParam.newCcAlfFilter[COMPONENT_Cr - 1] == 0,
         "bitstream conformance error: one of alf_luma_filter_signal_flag, alf_chroma_filter_signal_flag, "
         "alf_cross_component_cb_filter_signal_flag, and alf_cross_component_cr_filter_signal_flag shall be nonzero");
-  //½âÎöÁÁ¶ÈµÄ²ÎÊıÈë¿Ú
+  //è§£æäº®åº¦çš„å‚æ•°å…¥å£
   if (param.newFilterFlag[CHANNEL_TYPE_LUMA])
   {
     READ_FLAG(code, "alf_luma_clip");
@@ -984,7 +984,7 @@ void HLSyntaxReader::parseAlfAps( APS* aps )
     {
       memset(param.filterCoeffDeltaIdx, 0, sizeof(param.filterCoeffDeltaIdx));
     }
-    //½âÎöÂË²¨Æ÷²ÎÊıµÄÖ÷Ìåº¯Êı£¬½âÎöÁÁ¶È·ÖÁ¿µÄÂË²¨Æ÷²ÎÊı
+    //è§£ææ»¤æ³¢å™¨å‚æ•°çš„ä¸»ä½“å‡½æ•°ï¼Œè§£æäº®åº¦åˆ†é‡çš„æ»¤æ³¢å™¨å‚æ•°
     alfFilter( param, false, 0 );
   }
   if (param.newFilterFlag[CHANNEL_TYPE_CHROMA])
@@ -998,14 +998,14 @@ void HLSyntaxReader::parseAlfAps( APS* aps )
       code = 0;
 
     param.numAlternativesChroma = code + 1;
-    //½âÎöÂË²¨Æ÷²ÎÊıµÄÖ÷Ìåº¯Êı£¬½âÎöÉ«¶È·ÖÁ¿µÄÂË²¨Æ÷²ÎÊı
+    //è§£ææ»¤æ³¢å™¨å‚æ•°çš„ä¸»ä½“å‡½æ•°ï¼Œè§£æè‰²åº¦åˆ†é‡çš„æ»¤æ³¢å™¨å‚æ•°
     for( int altIdx=0; altIdx < param.numAlternativesChroma; ++altIdx )
     {
       alfFilter( param, true, altIdx );
     }
   }
 
-  for (int ccIdx = 0; ccIdx < 2; ccIdx++)//½âÎö²ÎÊı
+  for (int ccIdx = 0; ccIdx < 2; ccIdx++)//è§£æå‚æ•°
   {
     if (ccAlfParam.newCcAlfFilter[ccIdx])
     {
@@ -1026,7 +1026,7 @@ void HLSyntaxReader::parseAlfAps( APS* aps )
 
         short *coeff = ccAlfParam.ccAlfCoeff[ccIdx][filterIdx];
         // Filter coefficients
-        //½âÎöÂË²¨Æ÷²ÎÊı
+        //è§£ææ»¤æ³¢å™¨å‚æ•°
         for (int i = 0; i < alfShape.numCoeff - 1; i++)
         {
           READ_CODE(CCALF_BITS_PER_COEFF_LEVEL, code,
@@ -1050,14 +1050,14 @@ void HLSyntaxReader::parseAlfAps( APS* aps )
         }
         DTRACE(g_trace_ctx, D_SYNTAX, "\n");
       }
-      //ÉèÖÃ
+      //è®¾ç½®
       for (int filterIdx = ccAlfParam.ccAlfFilterCount[ccIdx]; filterIdx < MAX_NUM_CC_ALF_FILTERS; filterIdx++)
       {
         ccAlfParam.ccAlfFilterIdxEnabled[ccIdx][filterIdx] = false;
       }
     }
   }
-  //½âÎöÖ®ºóÉèÖÃ²ÎÊı
+  //è§£æä¹‹åè®¾ç½®å‚æ•°
   aps->setCcAlfAPSParam(ccAlfParam);
 
   aps->setAlfAPSParam(param);

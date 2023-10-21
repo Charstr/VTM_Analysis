@@ -881,31 +881,31 @@ void CodingStructure::setDecomp(const UnitArea &_area, const bool _isCoded /*= t
 
 const int CodingStructure::signalModeCons( const PartSplit split, Partitioner &partitioner, const ModeType modeTypeParent ) const
 {
-  // Èôµ±Ç°Îª DualTree£¬»ò¸¸½áµãÄ£Ê½ÀàĞÍ²»ÎªinterÓëintra¾ù³¢ÊÔ£¬»òµ±Ç°¿éÉ«¶È¸ñÊ½Îª444£¬»òµ±Ç°¿éÉ«¶È¸ñÊ½Îª400
-  // Ôò×Ó¿é RDO Ê±Ä£Ê½¼Ì³Ğ¸¸½áµã
+  // è‹¥å½“å‰ä¸º DualTreeï¼Œæˆ–çˆ¶ç»“ç‚¹æ¨¡å¼ç±»å‹ä¸ä¸ºinterä¸intraå‡å°è¯•ï¼Œæˆ–å½“å‰å—è‰²åº¦æ ¼å¼ä¸º444ï¼Œæˆ–å½“å‰å—è‰²åº¦æ ¼å¼ä¸º400
+  // åˆ™å­å— RDO æ—¶æ¨¡å¼ç»§æ‰¿çˆ¶ç»“ç‚¹
   if (CS::isDualITree(*this) || modeTypeParent != MODE_TYPE_ALL || partitioner.currArea().chromaFormat == CHROMA_444 || partitioner.currArea().chromaFormat == CHROMA_400 )
   {
     return LDT_MODE_TYPE_INHERIT;
   }
   int minLumaArea = partitioner.currArea().lumaSize().area();
-  // Èô»®·ÖÄ£Ê½Îª QT »ò TH »ò TV
-  // Ôò×îĞ¡ÁÁ¶ÈÇøÓòÎªµ±Ç°ÇøÓò/4
+  // è‹¥åˆ’åˆ†æ¨¡å¼ä¸º QT æˆ– TH æˆ– TV
+  // åˆ™æœ€å°äº®åº¦åŒºåŸŸä¸ºå½“å‰åŒºåŸŸ/4
   if (split == CU_QUAD_SPLIT || split == CU_TRIH_SPLIT || split == CU_TRIV_SPLIT) // the area is split into 3 or 4 parts
   {
     minLumaArea = minLumaArea >> 2;
   }
-  // Èô»®·ÖÄ£Ê½Îª BV »ò BH
-  // Ôò×îĞ¡ÁÁ¶ÈÇøÓòÎªµ±Ç°ÇøÓò/2
+  // è‹¥åˆ’åˆ†æ¨¡å¼ä¸º BV æˆ– BH
+  // åˆ™æœ€å°äº®åº¦åŒºåŸŸä¸ºå½“å‰åŒºåŸŸ/2
   else if (split == CU_VERT_SPLIT || split == CU_HORZ_SPLIT) // the area is split into 2 parts
   {
     minLumaArea = minLumaArea >> 1;
   }
-  // ×îĞ¡É«¶È¿é = ×îĞ¡ÁÁ¶ÈÇøÓò >> scale
+  // æœ€å°è‰²åº¦å— = æœ€å°äº®åº¦åŒºåŸŸ >> scale
   int minChromaBlock = minLumaArea >> (getChannelTypeScaleX(CHANNEL_TYPE_CHROMA, partitioner.currArea().chromaFormat) + getChannelTypeScaleY(CHANNEL_TYPE_CHROMA, partitioner.currArea().chromaFormat));
-  // £¨µ±Ç°É«¶ÈÇøÓò¿í¶ÈÎª4 ÇÒ »®·ÖÄ£Ê½Îª BV£© »ò £¨µ±Ç°É«¶ÈÇøÓò¿í¶ÈÎª8 ÇÒ »®·ÖÄ£Ê½Îª TV£©Ê±£¬É«¶È¿é³ß´çÎª 2*N
+  // ï¼ˆå½“å‰è‰²åº¦åŒºåŸŸå®½åº¦ä¸º4 ä¸” åˆ’åˆ†æ¨¡å¼ä¸º BVï¼‰ æˆ– ï¼ˆå½“å‰è‰²åº¦åŒºåŸŸå®½åº¦ä¸º8 ä¸” åˆ’åˆ†æ¨¡å¼ä¸º TVï¼‰æ—¶ï¼Œè‰²åº¦å—å°ºå¯¸ä¸º 2*N
   bool is2xNChroma = (partitioner.currArea().chromaSize().width == 4 && split == CU_VERT_SPLIT) || (partitioner.currArea().chromaSize().width == 8 && split == CU_TRIV_SPLIT);
-  // Èô×îĞ¡É«¶È¿é >= 16 ÇÒ É«¶È¿é³ß´ç²»ÊÇ 2*N Ê±£¬×Ó¿é RDO Ä£Ê½¼Ì³Ğ¸¸½áµã£¬·ñÔòÔÚ×îĞ¡ÁÁ¶È¿é<32 »ò 
-  // µ±Ç°Ö¡Îª INTRA Ê±×Ó¿éRDO Ä£Ê½Îª Intra£¬·ñÔòÏÈ×Ó¿éÏÈ²âÊÔ Inter ÔÙ²âÊÔ Intra
+  // è‹¥æœ€å°è‰²åº¦å— >= 16 ä¸” è‰²åº¦å—å°ºå¯¸ä¸æ˜¯ 2*N æ—¶ï¼Œå­å— RDO æ¨¡å¼ç»§æ‰¿çˆ¶ç»“ç‚¹ï¼Œå¦åˆ™åœ¨æœ€å°äº®åº¦å—<32 æˆ– 
+  // å½“å‰å¸§ä¸º INTRA æ—¶å­å—RDO æ¨¡å¼ä¸º Intraï¼Œå¦åˆ™å…ˆå­å—å…ˆæµ‹è¯• Inter å†æµ‹è¯• Intra
   return minChromaBlock >= 16 && !is2xNChroma ? LDT_MODE_TYPE_INHERIT : ((minLumaArea < 32) || slice->isIntra()) ? LDT_MODE_TYPE_INFER : LDT_MODE_TYPE_SIGNAL;
 }
 
@@ -977,7 +977,7 @@ CodingUnit* CodingStructure::getLumaCU( const Position &pos )
 
 CodingUnit* CodingStructure::getCU( const Position &pos, const ChannelType effChType )
 {
-  const CompArea &_blk = area.blocks[effChType];//µ±Ç°csËù´¦ÀíµÄÇøÓò
+  const CompArea &_blk = area.blocks[effChType];//å½“å‰csæ‰€å¤„ç†çš„åŒºåŸŸ
 
   if( !_blk.contains( pos ) || (treeType == TREE_C && effChType == CHANNEL_TYPE_LUMA) )
   {

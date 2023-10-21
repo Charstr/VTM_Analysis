@@ -74,14 +74,14 @@ class CodingStructure
 {
 public:
 
-  UnitArea         area;  //CodingStructureµÄ´¦ÀíÇøÓò
+  UnitArea         area;  //CodingStructureçš„å¤„ç†åŒºåŸŸ
 
-  Picture         *picture;//CodingStructureËù¹éÊôµÄpicture
-  CodingStructure *parent;//compressµİ¹éµü´ú¹ı³ÌÖĞ£¬×Ócuµİ¹éµÄÉÏÒ»¼¶µÄµÄ»®·Ö¿écu
-  CodingStructure *bestCS; //×îÓÅµÄ»®·Ö½á¹¹
+  Picture         *picture;//CodingStructureæ‰€å½’å±çš„picture
+  CodingStructure *parent;//compressé€’å½’è¿­ä»£è¿‡ç¨‹ä¸­ï¼Œå­cué€’å½’çš„ä¸Šä¸€çº§çš„çš„åˆ’åˆ†å—cu
+  CodingStructure *bestCS; //æœ€ä¼˜çš„åˆ’åˆ†ç»“æ„
   Slice           *slice;
 
-  UnitScale        unitScale[MAX_NUM_COMPONENT];//VTM´¦ÀíÁÁ¶È×îĞ¡µ¥ÔªÎª4x4£¬É«¶È2x2£¬½«ÏñËØµ¥Î»½øĞĞscale
+  UnitScale        unitScale[MAX_NUM_COMPONENT];//VTMå¤„ç†äº®åº¦æœ€å°å•å…ƒä¸º4x4ï¼Œè‰²åº¦2x2ï¼Œå°†åƒç´ å•ä½è¿›è¡Œscale
 
 
   int         baseQP;
@@ -95,7 +95,7 @@ public:
   APS *      lmcsAps;
   APS *      scalinglistAps;
   const VPS *vps;
-  const PreCalcValues* pcv;//´æ´¢CodingStructureÏà¹ØµÄÒ»Ğ©Í¨ÓÃÊı¾İ
+  const PreCalcValues* pcv;//å­˜å‚¨CodingStructureç›¸å…³çš„ä¸€äº›é€šç”¨æ•°æ®
 
 
   CodingStructure(CUCache&, PUCache&, TUCache&);

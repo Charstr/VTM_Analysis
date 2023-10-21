@@ -76,7 +76,7 @@ double RdCost::calcRdCost( uint64_t fracBits, Distortion distortion )
 #endif
 }
 
-// ¶Ôlambda½øĞĞµ÷Õû£¬·½±ãºó±ß¼ÆËãÊ¹ÓÃ
+// å¯¹lambdaè¿›è¡Œè°ƒæ•´ï¼Œæ–¹ä¾¿åè¾¹è®¡ç®—ä½¿ç”¨
 void RdCost::setLambda( double dLambda, const BitDepths &bitDepths )
 {
   m_dLambda             = dLambda;

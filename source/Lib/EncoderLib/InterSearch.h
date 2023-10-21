@@ -385,17 +385,17 @@ protected:
 
   typedef struct
   {
-    SearchRange searchRange;//æœç´ èŒƒå›´
-    const CPelBuf* pcPatternKey;//åŒ¹é…æ¨¡æ¿åƒç´ ï¼Œorig
-    const Pel*  piRefY;//æœç´¢åŒºåŸŸçš„åƒç´ ï¼Œå³å‚è€ƒå¸§åƒç´ 
-    int         iRefStride;//æœç´¢åŒºåŸŸåƒç´ çš„stride
+    SearchRange searchRange;//ËÑËØ·¶Î§
+    const CPelBuf* pcPatternKey;//Æ¥ÅäÄ£°åÏñËØ£¬orig
+    const Pel*  piRefY;//ËÑË÷ÇøÓòµÄÏñËØ£¬¼´²Î¿¼Ö¡ÏñËØ
+    int         iRefStride;//ËÑË÷ÇøÓòÏñËØµÄstride
     int         iBestX;
-    int         iBestY;//æœç´¢èŒƒå›´å†…çš„æœ€ä½³åŒ¹é…ç‚¹
+    int         iBestY;//ËÑË÷·¶Î§ÄÚµÄ×î¼ÑÆ¥Åäµã
     uint32_t        uiBestRound;
-    uint32_t        uiBestDistance;//æœç´¢ç‚¹è·èµ·ç‚¹çš„è·ç¦»
+    uint32_t        uiBestDistance;//ËÑË÷µã¾àÆğµãµÄ¾àÀë
     Distortion  uiBestSad;
-    uint8_t       ucPointNr;//æœç´¢ç‚¹ç›¸å¯¹äºèµ·å§‹ç‚¹çš„ä½ç½®çš„æ ‡å·
-    int         subShiftMode;//æœç´¢æ¨¡å¼
+    uint8_t       ucPointNr;//ËÑË÷µãÏà¶ÔÓÚÆğÊ¼µãµÄÎ»ÖÃµÄ±êºÅ
+    int         subShiftMode;//ËÑË÷Ä£Ê½
     unsigned    imvShift;
     bool        useAltHpelIf;
     bool        inCtuSearch;

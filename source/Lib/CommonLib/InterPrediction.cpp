@@ -453,7 +453,7 @@ void InterPrediction::xPredInterUni(const PredictionUnit &pu, const RefPicList &
 {
   const SPS &sps = *pu.cs->sps;
 
-  int iRefIdx = pu.refIdx[eRefPicList]; // ²Î¿¼Ö¡Ë÷Òı
+  int iRefIdx = pu.refIdx[eRefPicList]; // å‚è€ƒå¸§ç´¢å¼•
   Mv mv[3];
   bool isIBC = false;
   CHECK( !CU::isIBC( *pu.cu ) && pu.lwidth() == 4 && pu.lheight() == 4, "invalid 4x4 inter blocks" );
@@ -461,8 +461,8 @@ void InterPrediction::xPredInterUni(const PredictionUnit &pu, const RefPicList &
   {
     isIBC = true;
   }
-  // »ñÈ¡MV
-  // AffineÄ£Ê½Ê±ÔË¶¯²¹³¥ÓÃµ½mvÎª¿ØÖÆµãmv
+  // è·å–MV
+  // Affineæ¨¡å¼æ—¶è¿åŠ¨è¡¥å¿ç”¨åˆ°mvä¸ºæ§åˆ¶ç‚¹mv
   if( pu.cu->affine )
   {
     CHECK( iRefIdx < 0, "iRefIdx incorrect." );
@@ -471,11 +471,11 @@ void InterPrediction::xPredInterUni(const PredictionUnit &pu, const RefPicList &
     mv[1] = pu.mvAffi[eRefPicList][1];
     mv[2] = pu.mvAffi[eRefPicList][2];
   }
-  else //·ÇAffineÄ£Ê½Ê±£¬ÔË¶¯²¹³¥ËùÓÃmvÎªÖ®Ç°merge¡¢inter_MEµÈ»ñÈ¡µÄ
+  else //éAffineæ¨¡å¼æ—¶ï¼Œè¿åŠ¨è¡¥å¿æ‰€ç”¨mvä¸ºä¹‹å‰mergeã€inter_MEç­‰è·å–çš„
   {
     mv[0] = pu.mv[eRefPicList];
   }
-  // ½øĞĞMV²Ã¼ô
+  // è¿›è¡ŒMVè£å‰ª
   if( !pu.cu->affine )
   {
     if( !isIBC && pu.cu->slice->getRefPic( eRefPicList, iRefIdx )->isRefScaled( pu.cs->pps ) == false )
@@ -499,18 +499,18 @@ void InterPrediction::xPredInterUni(const PredictionUnit &pu, const RefPicList &
       continue;
     }
 
-    if ( pu.cu->affine )//AffineÄ£Ê½
+    if ( pu.cu->affine )//Affineæ¨¡å¼
     {
       CHECK( bioApplied, "BIO is not allowed with affine" );
       m_iRefListIdx = eRefPicList;
-      // Îª1±íÊ¾ÒªÉú³ÉÉ«¶ÈµÄ×Ó¿éMV
+      // ä¸º1è¡¨ç¤ºè¦ç”Ÿæˆè‰²åº¦çš„å­å—MV
       bool genChromaMv = (!luma && chroma && compID == COMPONENT_Cb);
-      // ÔÚ¿ªÆôaffineµÄÇé¿öÏÂ£¬»ñÈ¡ÏàÓ¦·ÖÁ¿µÄµ¥ÏòÔ¤²âÖµ£¨°üÀ¨PROFµÄÊµÏÖ£©
+      // åœ¨å¼€å¯affineçš„æƒ…å†µä¸‹ï¼Œè·å–ç›¸åº”åˆ†é‡çš„å•å‘é¢„æµ‹å€¼ï¼ˆåŒ…æ‹¬PROFçš„å®ç°ï¼‰
       xPredAffineBlk( compID, pu, pu.cu->slice->getRefPic( eRefPicList, iRefIdx )->unscaledPic, mv, pcYuvPred, bi, pu.cu->slice->clpRng( compID ), genChromaMv, pu.cu->slice->getScalingRatio( eRefPicList, iRefIdx ));
     }
     else
     {
-      // ·Ç·ÂÉäÄ£Ê½µÄ²¹³¥
+      // éä»¿å°„æ¨¡å¼çš„è¡¥å¿
       if (isIBC)
       {
         xPredInterBlk(compID, pu, pu.cu->slice->getPic(), mv[0], pcYuvPred, bi, pu.cu->slice->clpRng(compID),
@@ -518,7 +518,7 @@ void InterPrediction::xPredInterUni(const PredictionUnit &pu, const RefPicList &
       }
       else
       {
-        // ·Ç·ÂÉä
+        // éä»¿å°„
         xPredInterBlk( compID, pu, pu.cu->slice->getRefPic( eRefPicList, iRefIdx )->unscaledPic, mv[0], pcYuvPred, bi, pu.cu->slice->clpRng( compID ), bioApplied, isIBC, pu.cu->slice->getScalingRatio( eRefPicList, iRefIdx ) );
       }
     }
@@ -537,7 +537,7 @@ void InterPrediction::xPredInterBi(PredictionUnit &pu, PelUnitBuf &pcYuvPred, co
   const WPScalingParam *wp0 = pu.cs->slice->getWpScaling(REF_PIC_LIST_0, refIdx0);
   const WPScalingParam *wp1 = pu.cs->slice->getWpScaling(REF_PIC_LIST_1, refIdx1);
 
-  bool bioApplied = false; // BDOF±êÖ¾
+  bool bioApplied = false; // BDOFæ ‡å¿—
   if (pu.cs->sps->getBDOFEnabledFlag() && (!pu.cs->picHeader->getBdofDisabledFlag()))
   {
     if (pu.cu->affine || m_subPuMC)
@@ -588,7 +588,7 @@ void InterPrediction::xPredInterBi(PredictionUnit &pu, PelUnitBuf &pcYuvPred, co
   dmvrApplied = dmvrApplied && !refIsScaled;
   bioApplied = bioApplied && !refIsScaled;
 
-   // Ç°ºóÏòÁ½´Îµ¥Ïò²¹³¥£¬ºÏÆğÀ´¾ÍÊÇË«ÏòÔ¤²âÔË¶¯²¹³¥
+   // å‰åå‘ä¸¤æ¬¡å•å‘è¡¥å¿ï¼Œåˆèµ·æ¥å°±æ˜¯åŒå‘é¢„æµ‹è¿åŠ¨è¡¥å¿
   for (uint32_t refList = 0; refList < NUM_REF_PIC_LIST_01; refList++)
   {
     if( pu.refIdx[refList] < 0)
@@ -602,27 +602,27 @@ void InterPrediction::xPredInterBi(PredictionUnit &pu, PelUnitBuf &pcYuvPred, co
     CHECK(CU::isIBC(*pu.cu) && pu.refIdx[refList] != MAX_NUM_REF, "Invalid reference index for ibc mode");
     CHECK((CU::isInter(*pu.cu) && pu.refIdx[refList] >= slice.getNumRefIdx(eRefPicList)), "Invalid reference index");
     m_iRefListIdx = refList;
-    // µ¥ÏòÔË¶¯²¹³¥»ñµÃµÄÇ°ÏòºÍºóÏòÔ¤²âÏñËØ£¬´æ´¢ÓÚm_acYuvPred
+    // å•å‘è¿åŠ¨è¡¥å¿è·å¾—çš„å‰å‘å’Œåå‘é¢„æµ‹åƒç´ ï¼Œå­˜å‚¨äºm_acYuvPred
     PelUnitBuf pcMbBuf = ( pu.chromaFormat == CHROMA_400 ?
                            PelUnitBuf(pu.chromaFormat, PelBuf(m_acYuvPred[refList][0], pcYuvPred.Y())) :
                            PelUnitBuf(pu.chromaFormat, PelBuf(m_acYuvPred[refList][0], pcYuvPred.Y()), PelBuf(m_acYuvPred[refList][1], pcYuvPred.Cb()), PelBuf(m_acYuvPred[refList][2], pcYuvPred.Cr())) );
     
-    // puµÄÇ°ºóÏòÔ¤²â½Ô¿ÉÓÃ
+    // puçš„å‰åå‘é¢„æµ‹çš†å¯ç”¨
     if (pu.refIdx[0] >= 0 && pu.refIdx[1] >= 0)
     {
       if (dmvrApplied)
       {
         if (yuvPredTmp)
         {
-          xPredInterUni(pu, eRefPicList, pcMbBuf, true, false, luma, chroma); //µ¥ÏòÔË¶¯²¹³¥
+          xPredInterUni(pu, eRefPicList, pcMbBuf, true, false, luma, chroma); //å•å‘è¿åŠ¨è¡¥å¿
         }
         continue;
       }
       xPredInterUni(pu, eRefPicList, pcMbBuf, true, bioApplied, luma, chroma);
     }
-    else//µ¥ÏòÔ¤²â
+    else//å•å‘é¢„æµ‹
     {
-      // Ê¹ÓÃWP
+      // ä½¿ç”¨WP
       if( ( (pps.getUseWP() && slice.getSliceType() == P_SLICE) || (pps.getWPBiPred() && slice.getSliceType() == B_SLICE) ) )
       {
         xPredInterUni(pu, eRefPicList, pcMbBuf, true, bioApplied, luma, chroma);
@@ -634,8 +634,8 @@ void InterPrediction::xPredInterBi(PredictionUnit &pu, PelUnitBuf &pcYuvPred, co
     }
   }
   
-  // m_acYuvPredÖĞ´æ´¢µÄ£¬¾ÍÊÇÇ°ÃæÍ¨¹ıµ¥ÏòÔË¶¯²¹³¥»ñµÃµÄÇ°ÏòºÍºóÏòÔ¤²âÏñËØ
-  // srcPred0ÎªÇ°ÏòÔË¶¯²¹³¥µÄÔ¤²âÏñËØ£¬srcPred1ÎªºóÏòÔË¶¯²¹³¥µÄÔ¤²âÏñËØ
+  // m_acYuvPredä¸­å­˜å‚¨çš„ï¼Œå°±æ˜¯å‰é¢é€šè¿‡å•å‘è¿åŠ¨è¡¥å¿è·å¾—çš„å‰å‘å’Œåå‘é¢„æµ‹åƒç´ 
+  // srcPred0ä¸ºå‰å‘è¿åŠ¨è¡¥å¿çš„é¢„æµ‹åƒç´ ï¼ŒsrcPred1ä¸ºåå‘è¿åŠ¨è¡¥å¿çš„é¢„æµ‹åƒç´ 
   CPelUnitBuf srcPred0 = ( pu.chromaFormat == CHROMA_400 ?
                            CPelUnitBuf(pu.chromaFormat, PelBuf(m_acYuvPred[0][0], pcYuvPred.Y())) :
                            CPelUnitBuf(pu.chromaFormat, PelBuf(m_acYuvPred[0][0], pcYuvPred.Y()), PelBuf(m_acYuvPred[0][1], pcYuvPred.Cb()), PelBuf(m_acYuvPred[0][2], pcYuvPred.Cr())) );
@@ -645,10 +645,10 @@ void InterPrediction::xPredInterBi(PredictionUnit &pu, PelUnitBuf &pcYuvPred, co
   const bool lumaOnly   = luma && !chroma;
   const bool chromaOnly = !luma && chroma;
   
-  // ¼ÓÈ¨Ô¤²â
+  // åŠ æƒé¢„æµ‹
   if( !pu.cu->geoFlag && (!dmvrApplied) && (!bioApplied) && pps.getWPBiPred() && slice.getSliceType() == B_SLICE && pu.cu->BcwIdx == BCW_DEFAULT)
   {
-    // BÖ¡ÇÒ²ÉÓÃ¼ÓÈ¨Ô¤²âÊ±£¬Ë«Ïò¼ÓÈ¨Ô¤²â
+    // Bå¸§ä¸”é‡‡ç”¨åŠ æƒé¢„æµ‹æ—¶ï¼ŒåŒå‘åŠ æƒé¢„æµ‹
     xWeightedPredictionBi( pu, srcPred0, srcPred1, pcYuvPred, m_maxCompIDToPred, lumaOnly, chromaOnly );
     if (yuvPredTmp)
     {
@@ -657,7 +657,7 @@ void InterPrediction::xPredInterBi(PredictionUnit &pu, PelUnitBuf &pcYuvPred, co
   }
   else if( !pu.cu->geoFlag && pps.getUseWP() && slice.getSliceType() == P_SLICE )
   {
-    // PÖ¡ÇÒ²ÉÓÃ¼ÓÈ¨Ô¤²âÊ±£¬µ¥Ïò¼ÓÈ¨Ô¤²â
+    // På¸§ä¸”é‡‡ç”¨åŠ æƒé¢„æµ‹æ—¶ï¼Œå•å‘åŠ æƒé¢„æµ‹
     xWeightedPredictionUni( pu, srcPred0, REF_PIC_LIST_0, pcYuvPred, -1, m_maxCompIDToPred, lumaOnly, chromaOnly );
     if (yuvPredTmp)
     {
@@ -668,7 +668,7 @@ void InterPrediction::xPredInterBi(PredictionUnit &pu, PelUnitBuf &pcYuvPred, co
   {
     if (dmvrApplied)
     {
-      // Ë«ÏòÔ¤²â
+      // åŒå‘é¢„æµ‹
       if (yuvPredTmp)
       {
         yuvPredTmp->addAvg(srcPred0, srcPred1, slice.clpRngs(), false);
@@ -678,7 +678,7 @@ void InterPrediction::xPredInterBi(PredictionUnit &pu, PelUnitBuf &pcYuvPred, co
     }
     else
     {
-      // BCW CU¼¶Ë«Ïò¼ÓÈ¨Ô¤²â  BDOF
+      // BCW CUçº§åŒå‘åŠ æƒé¢„æµ‹  BDOF
       xWeightedAverage( pu, srcPred0, srcPred1, pcYuvPred, slice.getSPS()->getBitDepths(), slice.clpRngs(), bioApplied, lumaOnly, chromaOnly, yuvPredTmp );
     }
   }
@@ -698,19 +698,19 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
   JVET_J0090_SET_REF_PICTURE( refPic, compID );
   const ChromaFormat  chFmt = pu.chromaFormat;
   const bool          rndRes = !bi;
-  //ÔË¶¯Ê¸Á¿´æ´¢¾«¶ÈÏà¹Ø
+  //è¿åŠ¨çŸ¢é‡å­˜å‚¨ç²¾åº¦ç›¸å…³
   int shiftHor = MV_FRACTIONAL_BITS_INTERNAL + ::getComponentScaleX(compID, chFmt);
   int shiftVer = MV_FRACTIONAL_BITS_INTERNAL + ::getComponentScaleY(compID, chFmt);
 
-  bool  wrapRef = false;//Îª1±íÊ¾ÊÇhorizontal wrap-aroundÔË¶¯²¹³¥
+  bool  wrapRef = false;//ä¸º1è¡¨ç¤ºæ˜¯horizontal wrap-aroundè¿åŠ¨è¡¥å¿
   Mv    mv(_mv);
   if( !isIBC && refPic->isWrapAroundEnabled( pu.cs->pps ) )
   {
     wrapRef = wrapClipMv( mv, pu.blocks[0].pos(), pu.blocks[0].size(), pu.cs->sps, pu.cs->pps );
   }
 
-  bool useAltHpelIf = pu.cu->imv == IMV_HPEL;//Îª1±íÊ¾MVDµÄ´«Êä¾«¶ÈÊÇ°ëÏñËØ
-  //¿ÉÄÜÊÇËõ·ÅÏà¹ØµÄ
+  bool useAltHpelIf = pu.cu->imv == IMV_HPEL;//ä¸º1è¡¨ç¤ºMVDçš„ä¼ è¾“ç²¾åº¦æ˜¯åŠåƒç´ 
+  //å¯èƒ½æ˜¯ç¼©æ”¾ç›¸å…³çš„
   if( !isIBC && xPredInterBlkRPR( scalingRatio, *pu.cs->pps, CompArea( compID, chFmt, pu.blocks[compID], Size( dstPic.bufs[compID].width, dstPic.bufs[compID].height ) ), refPic, mv, dstPic.bufs[compID].buf, dstPic.bufs[compID].stride, bi, wrapRef, clpRng, 0, useAltHpelIf ) )
   {
     CHECK( bilinearMC, "DMVR should be disabled with RPR" );
@@ -739,7 +739,7 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
     unsigned width  = dstBuf.width;
     unsigned height = dstBuf.height;
 
-    CPelBuf refBuf; //´æ´¢×Å²Î¿¼Ö¡ÖĞÏàÓ¦µÄ²Î¿¼¿é
+    CPelBuf refBuf; //å­˜å‚¨ç€å‚è€ƒå¸§ä¸­ç›¸åº”çš„å‚è€ƒå—
     {
       Position offset = pu.blocks[compID].pos().offset(mv.getHor() >> shiftHor, mv.getVer() >> shiftVer);
       if (dmvrWidth)
@@ -777,7 +777,7 @@ void InterPrediction::xPredInterBlk ( const ComponentID& compID, const Predictio
       dstBuf.stride = width;
       dstBuf.buf    = m_filteredBlockTmp[2 + m_iRefListIdx][compID] + 2 * dstBuf.stride + 2;
     }
-    //¸ù¾İ¾«¶È½øĞĞÂË²¨µÈ²Ù×÷
+    //æ ¹æ®ç²¾åº¦è¿›è¡Œæ»¤æ³¢ç­‰æ“ä½œ
     if (yFrac == 0)
     {
       m_if.filterHor(compID, (Pel *) refBuf.buf, refBuf.stride, dstBuf.buf, dstBuf.stride, backupWidth, backupHeight,
@@ -921,7 +921,7 @@ void InterPrediction::xPredAffineBlk(const ComponentID &compID, const Prediction
   const int puy = pu.ly();
 #endif
 
-  // get affine sub-block width and height ·ÂÉäÄ£ĞÍÔË¶¯²¹³¥ÊÇ»ùÓÚ×Ó¿é½øĞĞµÄ
+  // get affine sub-block width and height ä»¿å°„æ¨¡å‹è¿åŠ¨è¡¥å¿æ˜¯åŸºäºå­å—è¿›è¡Œçš„
   const int width  = pu.Y().width;
   const int height = pu.Y().height;
   int blockWidth = AFFINE_MIN_BLOCK_SIZE;
@@ -935,7 +935,7 @@ void InterPrediction::xPredAffineBlk(const ComponentID &compID, const Prediction
   const int cxHeight = height >> iScaleY;
   const int iHalfBW  = blockWidth  >> 1;
   const int iHalfBH  = blockHeight >> 1;
-  //¹¹½¨·ÂÉä²ÎÊı
+  //æ„å»ºä»¿å°„å‚æ•°
   const int iBit = MAX_CU_DEPTH;
   int iDMvHorX, iDMvHorY, iDMvVerX, iDMvVerY;
   iDMvHorX = (mvRT - mvLT).getHor() << (iBit - floorLog2(cxWidth));
@@ -959,7 +959,7 @@ void InterPrediction::xPredAffineBlk(const ComponentID &compID, const Prediction
 
   const int shift = iBit - 4 + MV_FRACTIONAL_BITS_INTERNAL;
   bool      wrapRef = false;
-  //¼ì²â¸Ã²ÎÊıÏÂÉú³ÉµÄMVÊÇ·ñ»á³¬¹ı²Î¿¼·¶Î§µÄÏŞÖÆ
+  //æ£€æµ‹è¯¥å‚æ•°ä¸‹ç”Ÿæˆçš„MVæ˜¯å¦ä¼šè¶…è¿‡å‚è€ƒèŒƒå›´çš„é™åˆ¶
   const bool subblkMVSpreadOverLimit = isSubblockVectorSpreadOverLimit( iDMvHorX, iDMvHorY, iDMvVerX, iDMvVerY, pu.interDir );
   //Prediction refinement with optical flow PROF
   bool enablePROF = (sps.getUsePROF()) && (!m_skipPROF) && (compID == COMPONENT_Y);
@@ -990,13 +990,13 @@ void InterPrediction::xPredAffineBlk(const ComponentID &compID, const Prediction
   int *dMvScaleHor = m_dMvBuf[m_iRefListIdx];
   int *dMvScaleVer = m_dMvBuf[m_iRefListIdx] + 16;
 
-  //Èç¹ûÊ¹ÓÃ¹âÁ÷¹À¼ÆÏ¸»¯½á¹û 
+  //å¦‚æœä½¿ç”¨å…‰æµä¼°è®¡ç»†åŒ–ç»“æœ 
   /*
-    1.»ùÓÚ×Ó¿éµÄ·ÂÉä²¹³¥
-    2.Ê¹ÓÃ[-1,0,1]Éú³ÉÁ½¸ö·½ÏòÉÏµÄÌİ¶È£¨ºÍË«Ïò¹âÁ÷ÖĞ·½·¨ÏàÍ¬£©Ìİ¶È¼ÆËãÊ¹ÓÃ±ßÔµÀ©Õ¹·¨£¬
-          ÖµÎª²Î¿¼¿éÏàÓ¦À©Õ¹Î»ÖÃÏñËØÖµ
-    3.Ê¹ÓÃ¹âÁ÷·½³Ì¼ÆËã¹âÁ÷£¬
-    4.Ê¹ÓÃ¹âÁ÷½á¹ûÏ¸»¯·ÂÉä²¹³¥½á¹û  
+    1.åŸºäºå­å—çš„ä»¿å°„è¡¥å¿
+    2.ä½¿ç”¨[-1,0,1]ç”Ÿæˆä¸¤ä¸ªæ–¹å‘ä¸Šçš„æ¢¯åº¦ï¼ˆå’ŒåŒå‘å…‰æµä¸­æ–¹æ³•ç›¸åŒï¼‰æ¢¯åº¦è®¡ç®—ä½¿ç”¨è¾¹ç¼˜æ‰©å±•æ³•ï¼Œ
+          å€¼ä¸ºå‚è€ƒå—ç›¸åº”æ‰©å±•ä½ç½®åƒç´ å€¼
+    3.ä½¿ç”¨å…‰æµæ–¹ç¨‹è®¡ç®—å…‰æµï¼Œ
+    4.ä½¿ç”¨å…‰æµç»“æœç»†åŒ–ä»¿å°„è¡¥å¿ç»“æœ  
   */
   if (enablePROF)
   {
@@ -1007,7 +1007,7 @@ void InterPrediction::xPredAffineBlk(const ComponentID &compID, const Prediction
     int quadVerX = iDMvVerX << 2;
     int quadVerY = iDMvVerY << 2;
 
-    // Ìİ¶È
+    // æ¢¯åº¦
     dMvH[0] = ((iDMvHorX + iDMvVerX) << 1) - ((quadHorX + quadVerX) << 1);
     dMvV[0] = ((iDMvHorY + iDMvVerY) << 1) - ((quadHorY + quadVerY) << 1);
 
@@ -1557,26 +1557,26 @@ void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBu
   const PPS &pps            = *cs.pps;
   const SliceType sliceType =  cs.slice->getSliceType();
 
-  // Ö¸Ã÷ÁËpuµÄ²Î¿¼ÁĞ±í£¬µ¥ÏòÔ¤²â
+  // æŒ‡æ˜äº†puçš„å‚è€ƒåˆ—è¡¨ï¼Œå•å‘é¢„æµ‹
   if( eRefPicList != REF_PIC_LIST_X )
   {
     CHECK(predBufWOBIO != NULL, "the case should not happen!");
     if ((CU::isIBC(*pu.cu) == false) && ((sliceType == P_SLICE && pps.getUseWP()) || (sliceType == B_SLICE && pps.getWPBiPred())))
     {
-      // µ¥ÏòÔ¤²â	×îºóÒ»¸ö²ÎÊıÎªtrue±íÊ¾Ö®ºó»¹Òª½øĞĞ¼ÓÈ¨Ô¤²â
+      // å•å‘é¢„æµ‹	æœ€åä¸€ä¸ªå‚æ•°ä¸ºtrueè¡¨ç¤ºä¹‹åè¿˜è¦è¿›è¡ŒåŠ æƒé¢„æµ‹
       xPredInterUni(pu, eRefPicList, predBuf, true, false, luma, chroma);
-      // µ¥Ïò¼ÓÈ¨Ô¤²â
+      // å•å‘åŠ æƒé¢„æµ‹
       xWeightedPredictionUni(pu, predBuf, eRefPicList, predBuf, -1, m_maxCompIDToPred, (luma && !chroma),
                              (!luma && chroma));
     }
     else
     {
-      // µ¥ÏòÔ¤²â
-      // xPredAffineBlkº¯Êı¶Ô·ÅÉä¿é²¹³¥£¬ÓÉPROF
+      // å•å‘é¢„æµ‹
+      // xPredAffineBlkå‡½æ•°å¯¹æ”¾å°„å—è¡¥å¿ï¼Œç”±PROF
       xPredInterUni(pu, eRefPicList, predBuf, false, false, luma, chroma);
     }
   }
-  else //Ë«ÏòÔ¤²â
+  else //åŒå‘é¢„æµ‹
   {
     CHECK( !pu.cu->affine && pu.refIdx[0] >= 0 && pu.refIdx[1] >= 0 && ( pu.lwidth() + pu.lheight() == 12 ), "invalid 4x8/8x4 bi-predicted blocks" );
     int refIdx0 = pu.refIdx[REF_PIC_LIST_0];
@@ -1585,7 +1585,7 @@ void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBu
     const WPScalingParam *wp0 = pu.cs->slice->getWpScaling(REF_PIC_LIST_0, refIdx0);
     const WPScalingParam *wp1 = pu.cs->slice->getWpScaling(REF_PIC_LIST_1, refIdx1);
 
-    // ÊÇ·ñBDOF
+    // æ˜¯å¦BDOF
     bool bioApplied = false;
     const Slice &slice = *pu.cs->slice;
     if (pu.cs->sps->getBDOFEnabledFlag() && (!pu.cs->picHeader->getBdofDisabledFlag()))
@@ -1629,29 +1629,29 @@ void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBu
         bioApplied = false;
       }
     }
-    // refIsScaled±íÊ¾²Î¿¼Ö¡½øĞĞ¹ıËõ·Å£¬Ôò²»ÄÜ¿ªÆôBDOF
+    // refIsScaledè¡¨ç¤ºå‚è€ƒå¸§è¿›è¡Œè¿‡ç¼©æ”¾ï¼Œåˆ™ä¸èƒ½å¼€å¯BDOF
     bool refIsScaled = ( refIdx0 < 0 ? false : pu.cu->slice->getRefPic( REF_PIC_LIST_0, refIdx0 )->isRefScaled( pu.cs->pps ) ) ||
                        ( refIdx1 < 0 ? false : pu.cu->slice->getRefPic( REF_PIC_LIST_1, refIdx1 )->isRefScaled( pu.cs->pps ) );
     bioApplied = refIsScaled ? false : bioApplied;
     bool dmvrApplied = false;
     dmvrApplied = (pu.mvRefine) && PU::checkDMVRCondition(pu);
 
-    // PUµÄ¿í»ò¸ß>16 ÇÒ·ÇATMVP ÇÒÓ¦ÓÃBDOF²»ÓÃDMVR
+    // PUçš„å®½æˆ–é«˜>16 ä¸”éATMVP ä¸”åº”ç”¨BDOFä¸ç”¨DMVR
     if ((pu.lumaSize().width > MAX_BDOF_APPLICATION_REGION || pu.lumaSize().height > MAX_BDOF_APPLICATION_REGION) && pu.mergeType != MRG_TYPE_SUBPU_ATMVP && (bioApplied && !dmvrApplied))
     {
-      // ·Ö³ÉĞ¡¿é½øĞĞBDOF
+      // åˆ†æˆå°å—è¿›è¡ŒBDOF
       xSubPuBio(pu, predBuf, eRefPicList, predBufWOBIO);
     }
     else
     {
-      // µ±PUÊÇATMVPÄ£Ê½Ê±£¬»®·ÖsubPUÔË¶¯²¹³¥
+      // å½“PUæ˜¯ATMVPæ¨¡å¼æ—¶ï¼Œåˆ’åˆ†subPUè¿åŠ¨è¡¥å¿
       if (pu.mergeType != MRG_TYPE_DEFAULT_N && pu.mergeType != MRG_TYPE_IBC)
       {
         CHECK(predBufWOBIO != NULL, "the case should not happen!");
         xSubPuMC(pu, predBuf, eRefPicList, luma, chroma);
       }
 
-      // Èç¹ûÇ°ºóÁ½¸ö·½ÏòµÄ²Î¿¼pocÏàÍ¬£¬mvÏàÍ¬£¬Ôò¹éÎªµ¥Ïò´¦Àí
+      // å¦‚æœå‰åä¸¤ä¸ªæ–¹å‘çš„å‚è€ƒpocç›¸åŒï¼Œmvç›¸åŒï¼Œåˆ™å½’ä¸ºå•å‘å¤„ç†
       else if (xCheckIdenticalMotion(pu))
       {
         xPredInterUni(pu, REF_PIC_LIST_0, predBuf, false, false, luma, chroma);
@@ -1660,8 +1660,8 @@ void InterPrediction::motionCompensation( PredictionUnit &pu, PelUnitBuf &predBu
       }
       else
       {
-        // ·Ö±ğ½øĞĞÁ½´Îµ¥ÏòÔ¤²â£¬È»ºó½«Æä½øĞĞ¼ÓÈ¨, ½øĞĞDMVR¡¢BDOFµÈ
-        xPredInterBi(pu, predBuf, luma, chroma, predBufWOBIO);//Ë«ÏòÔ¤²â	ÆäÖĞ»á½øĞĞË«ÏòÔ¤²âµÄ¼ÓÈ¨Ô¤²â
+        // åˆ†åˆ«è¿›è¡Œä¸¤æ¬¡å•å‘é¢„æµ‹ï¼Œç„¶åå°†å…¶è¿›è¡ŒåŠ æƒ, è¿›è¡ŒDMVRã€BDOFç­‰
+        xPredInterBi(pu, predBuf, luma, chroma, predBufWOBIO);//åŒå‘é¢„æµ‹	å…¶ä¸­ä¼šè¿›è¡ŒåŒå‘é¢„æµ‹çš„åŠ æƒé¢„æµ‹
       }
     }
   }
@@ -2092,7 +2092,7 @@ void InterPrediction::xProcessDMVR(PredictionUnit& pu, PelUnitBuf &pcYuvDst, con
 
   m_biLinearBufStride = (MAX_CU_SIZE + (2 * DMVR_NUM_ITERATION));
 
-  // ·Ö¿é²½³¤µÄ´óĞ¡£¬ÓĞµÄ¿é²»×ã16x16
+  // åˆ†å—æ­¥é•¿çš„å¤§å°ï¼Œæœ‰çš„å—ä¸è¶³16x16
   int dy = std::min<int>(pu.lumaSize().height, DMVR_SUBCU_HEIGHT);
   int dx = std::min<int>(pu.lumaSize().width,  DMVR_SUBCU_WIDTH);
   Position puPos = pu.lumaPos();
@@ -2179,7 +2179,7 @@ void InterPrediction::xProcessDMVR(PredictionUnit& pu, PelUnitBuf &pcYuvDst, con
     srcPred1 = srcPred1.subBuf(UnitAreaRelative(pu, subPu));
 
     int yStart = 0;
-    // ·ÖÎª16x16¿é½øĞĞ´¦Àí
+    // åˆ†ä¸º16x16å—è¿›è¡Œå¤„ç†
     for (int y = puPos.y; y < (puPos.y + pu.lumaSize().height); y = y + dy, yStart = yStart + dy)
     {
       for (int x = puPos.x, xStart = 0; x < (puPos.x + pu.lumaSize().width); x = x + dx, xStart = xStart + dx)
@@ -2196,7 +2196,7 @@ void InterPrediction::xProcessDMVR(PredictionUnit& pu, PelUnitBuf &pcYuvDst, con
         int16_t totalDeltaMV[2] = { 0,0 };
         int16_t deltaMV[2] = { 0, 0 };
         uint64_t  *pSADsArray;
-        // 25¸öÕûÏñËØµãSADÖµµÄ³õÊ¼»¯²Ù×÷
+        // 25ä¸ªæ•´åƒç´ ç‚¹SADå€¼çš„åˆå§‹åŒ–æ“ä½œ
         for (int i = 0; i < (((2 * DMVR_NUM_ITERATION) + 1) * ((2 * DMVR_NUM_ITERATION) + 1)); i++)
         {
           m_SADsArray[i] = MAX_UINT64;
@@ -2206,20 +2206,20 @@ void InterPrediction::xProcessDMVR(PredictionUnit& pu, PelUnitBuf &pcYuvDst, con
         {
           deltaMV[0] = 0;
           deltaMV[1] = 0;
-          // ³õÊ¼µÄMV¼ÆËã³öµÄ×ÓCUµÄÇ°Ïò¼°ºóÏòÔ¤²âÖµ
-          // ¶ÔÓÚÍ¬Ò»¸öMVÆ«ÒÆ£¬Ç°ÏòMVÊÇ¼ÓÉÏÆ«ÒÆÁ¿£¬ºóÏòMVÊÇ¼õÈ¥Æ«ÒÆÁ¿
+          // åˆå§‹çš„MVè®¡ç®—å‡ºçš„å­CUçš„å‰å‘åŠåå‘é¢„æµ‹å€¼
+          // å¯¹äºåŒä¸€ä¸ªMVåç§»ï¼Œå‰å‘MVæ˜¯åŠ ä¸Šåç§»é‡ï¼Œåå‘MVæ˜¯å‡å»åç§»é‡
           Pel *addrL0 = biLinearPredL0 + totalDeltaMV[0] + (totalDeltaMV[1] * m_biLinearBufStride);
           Pel *addrL1 = biLinearPredL1 - totalDeltaMV[0] - (totalDeltaMV[1] * m_biLinearBufStride);
           if (i == 0)
           {
-            // ¼ÆËã³õÊ¼MV¶ÔÓ¦µÄCost
+            // è®¡ç®—åˆå§‹MVå¯¹åº”çš„Cost
             minCost = xDMVRCost(clpRngs.comp[COMPONENT_Y].bd, addrL0, m_biLinearBufStride, addrL1, m_biLinearBufStride, dx, dy);
-            minCost -= (minCost >>2);  // Ê¹ÓÃ3/4µÄÊ§Õæ
-            // ÅĞ¶Ï³õÊ¼MVµÄCostÖµÊÇ·ñĞ¡ÓÚãĞÖµ£¬ÌáÇ°ÖÕÖ¹ÕûÏñËØËÑË÷
+            minCost -= (minCost >>2);  // ä½¿ç”¨3/4çš„å¤±çœŸ
+            // åˆ¤æ–­åˆå§‹MVçš„Costå€¼æ˜¯å¦å°äºé˜ˆå€¼ï¼Œæå‰ç»ˆæ­¢æ•´åƒç´ æœç´¢
             if (minCost < (dx * dy))
             {
               notZeroCost = false;
-              break; // Ö»ÄÜÌø³ö¸Ã²ãÑ­»·
+              break; // åªèƒ½è·³å‡ºè¯¥å±‚å¾ªç¯
             }
             pSADsArray[0] = minCost;
           }
@@ -2229,14 +2229,14 @@ void InterPrediction::xProcessDMVR(PredictionUnit& pu, PelUnitBuf &pcYuvDst, con
             break;
           }
 
-          // ¼ÆËã25¸öÕûÏñËØµãµÄ¶ÔÓ¦µÄCost
+          // è®¡ç®—25ä¸ªæ•´åƒç´ ç‚¹çš„å¯¹åº”çš„Cost
           xBIPMVRefine(bd, addrL0, addrL1, minCost, deltaMV, pSADsArray, dx, dy);
-          // ÕûÏñËØÊÇËÑË÷½×¶ÎÊÇ·ñ½áÊø£¬ÕâÁ½¸ö±äÁ¿ÎªÕûÏñËØÆ«ÒÆÁ¿
+          // æ•´åƒç´ æ˜¯æœç´¢é˜¶æ®µæ˜¯å¦ç»“æŸï¼Œè¿™ä¸¤ä¸ªå˜é‡ä¸ºæ•´åƒç´ åç§»é‡
           if (deltaMV[0] == 0 && deltaMV[1] == 0)
           {
             break;
           }
-          // ÓÃÕûÏñËØÆ«ÒÆĞŞÕı
+          // ç”¨æ•´åƒç´ åç§»ä¿®æ­£
           totalDeltaMV[0] += deltaMV[0];
           totalDeltaMV[1] += deltaMV[1];
           pSADsArray += ((deltaMV[1] * (((2 * DMVR_NUM_ITERATION) + 1))) + deltaMV[0]);
@@ -2245,7 +2245,7 @@ void InterPrediction::xProcessDMVR(PredictionUnit& pu, PelUnitBuf &pcYuvDst, con
         bioAppliedType[num] = (minCost < bioEnabledThres) ? false : bioApplied;
         totalDeltaMV[0] = (totalDeltaMV[0] << mvShift);
         totalDeltaMV[1] = (totalDeltaMV[1] << mvShift);
-        // ·ÖÏñËØËÑË÷
+        // åˆ†åƒç´ æœç´¢
         xDMVRSubPixelErrorSurface(notZeroCost, totalDeltaMV, deltaMV, pSADsArray);
 
         pu.mvdL0SubPu[num] = Mv(totalDeltaMV[0], totalDeltaMV[1]);
@@ -2267,8 +2267,8 @@ void InterPrediction::xProcessDMVR(PredictionUnit& pu, PelUnitBuf &pcYuvDst, con
         int dstStride[MAX_NUM_COMPONENT] = { pcYuvDst.bufs[COMPONENT_Y].stride,
                                              isChromaEnabled(pu.chromaFormat) ? pcYuvDst.bufs[COMPONENT_Cb].stride : 0,
                                              isChromaEnabled(pu.chromaFormat) ? pcYuvDst.bufs[COMPONENT_Cr].stride : 0};
-        // ×ÓpuµÄ×îÖÕĞŞÕıºóµÄMVÊÇÔ­À´µÄMergeµÄ³õÊ¼MV¼ÓÉÏ×ÓpuµÄĞŞÕıMVD
-        // (¼´MVµÄÆ«ÖÃ£¬Ç°Ïò¼ÓÆ«ÖÃ£¬ºóÏò¼õÈ¥Æ«ÖÃ£¬³ÊÏÖ¾µÏñµÄ·½Ê½)
+        // å­puçš„æœ€ç»ˆä¿®æ­£åçš„MVæ˜¯åŸæ¥çš„Mergeçš„åˆå§‹MVåŠ ä¸Šå­puçš„ä¿®æ­£MVD
+        // (å³MVçš„åç½®ï¼Œå‰å‘åŠ åç½®ï¼Œåå‘å‡å»åç½®ï¼Œå‘ˆç°é•œåƒçš„æ–¹å¼)
         subPu.mv[0] = mergeMv[REF_PIC_LIST_0] + pu.mvdL0SubPu[num];
         subPu.mv[1] = mergeMv[REF_PIC_LIST_1] - pu.mvdL0SubPu[num];
 

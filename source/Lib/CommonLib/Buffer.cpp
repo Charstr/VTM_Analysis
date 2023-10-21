@@ -136,7 +136,7 @@ void gradFilterCore(Pel* pSrc, int srcStride, int width, int height, int gradStr
   gradYTmp = gradY + gradStride + 1;
   for (int y = 0; y < (height - 2 * BIO_EXTEND_SIZE); y++)
   {
-    // ±ß½çÌÝ¶È
+    // è¾¹ç•Œæ¢¯åº¦
     gradXTmp[-1] = gradXTmp[0];
     gradXTmp[width - 2 * BIO_EXTEND_SIZE] = gradXTmp[width - 2 * BIO_EXTEND_SIZE - 1];
     gradXTmp += gradStride;
@@ -427,13 +427,13 @@ void AreaBuf<Pel>::rspSignal(std::vector<Pel>& pLUT)
   {
     for (unsigned x = 0; x < width; x++)
     {
-      dst[x] = pLUT[src[x]];//Í¨¹ý²é±íÊµÏÖ¶ÔÃ¿Ò»¸öÏñËØÖµµÄ×ª»»
+      dst[x] = pLUT[src[x]];//é€šè¿‡æŸ¥è¡¨å®žçŽ°å¯¹æ¯ä¸€ä¸ªåƒç´ å€¼çš„è½¬æ¢
     }
     dst += stride;
     src += stride;
   }
 }
-//ÊµÏÖ¶ÔÏñËØÖµµÄËõ·Å¡£¸Ãº¯Êý¿ØÖÆÕý·´¡£
+//å®žçŽ°å¯¹åƒç´ å€¼çš„ç¼©æ”¾ã€‚è¯¥å‡½æ•°æŽ§åˆ¶æ­£åã€‚
 template<>
 void AreaBuf<Pel>::scaleSignal(const int scale, const bool dir, const ClpRng& clpRng)
 {

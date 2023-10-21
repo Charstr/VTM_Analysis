@@ -180,33 +180,33 @@ int SampleAdaptiveOffset::getMergeList(CodingStructure& cs, int ctuRsAddr, SAOBl
   int mergedCTUPos;
   int numValidMergeCandidates = 0;
 
-  for(int mergeType=0; mergeType< NUM_SAO_MERGE_TYPES; mergeType++)//±éÀúÉÏ¿é²ÎÊıÈÚºÏºÍ×ó¿é²ÎÊıÈÚºÏ
+  for(int mergeType=0; mergeType< NUM_SAO_MERGE_TYPES; mergeType++)//éå†ä¸Šå—å‚æ•°èåˆå’Œå·¦å—å‚æ•°èåˆ
   {
     SAOBlkParam* mergeCandidate = NULL;
 
     switch(mergeType)
     {
-    case SAO_MERGE_ABOVE://ÉÏ¿é
+    case SAO_MERGE_ABOVE://ä¸Šå—
       {
         if(ctuY > 0)
         {
-          mergedCTUPos = ctuRsAddr- pcv.widthInCtus;//ÉÏ¿éµÄÎ»ÖÃ;
+          mergedCTUPos = ctuRsAddr- pcv.widthInCtus;//ä¸Šå—çš„ä½ç½®;
           if(cs.getCURestricted(Position(ctuX*pcv.maxCUWidth, (ctuY-1)*pcv.maxCUHeight), cu, cu.chType))
           {
-            mergeCandidate = &(blkParams[mergedCTUPos]);//»ñÈ¡ÉÏ¿éCTUµÄ²ÎÊı
+            mergeCandidate = &(blkParams[mergedCTUPos]);//è·å–ä¸Šå—CTUçš„å‚æ•°
 
           }
         }
       }
       break;
-    case SAO_MERGE_LEFT://×ó¿é
+    case SAO_MERGE_LEFT://å·¦å—
       {
         if(ctuX > 0)
         {
-          mergedCTUPos = ctuRsAddr- 1;//×ó¿éµÄÎ»ÖÃ
+          mergedCTUPos = ctuRsAddr- 1;//å·¦å—çš„ä½ç½®
           if(cs.getCURestricted(Position((ctuX-1)*pcv.maxCUWidth, ctuY*pcv.maxCUHeight), cu, cu.chType))
           {
-            mergeCandidate = &(blkParams[mergedCTUPos]);//»ñÈ¡×ó¿éCTUµÄ²ÎÊı
+            mergeCandidate = &(blkParams[mergedCTUPos]);//è·å–å·¦å—CTUçš„å‚æ•°
           }
         }
       }
@@ -217,14 +217,14 @@ int SampleAdaptiveOffset::getMergeList(CodingStructure& cs, int ctuRsAddr, SAOBl
       }
     }
 
-    mergeList[mergeType]=mergeCandidate;//½«mergeCandidate±£´æmergeÁĞ±í
+    mergeList[mergeType]=mergeCandidate;//å°†mergeCandidateä¿å­˜mergeåˆ—è¡¨
     if (mergeCandidate != NULL)
     {
-      numValidMergeCandidates++;//ÓĞĞ§MergeºòÑ¡ÊıÀÛ¼Ó;
+      numValidMergeCandidates++;//æœ‰æ•ˆMergeå€™é€‰æ•°ç´¯åŠ ;
     }
   }
 
-  return numValidMergeCandidates;//·µ»ØÓĞĞ§mergeºòÑ¡µÄÊıÁ¿;
+  return numValidMergeCandidates;//è¿”å›æœ‰æ•ˆmergeå€™é€‰çš„æ•°é‡;
 }
 
 
@@ -558,14 +558,14 @@ void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& s
       bAllOff=false;
     }
   }
-  if (bAllOff)//Èç¹ûÈı¸ö·ÖÁ¿¶¼Ã»ÓĞÊ¹ÓÃSAO,Ôò·µ»Ø
+  if (bAllOff)//å¦‚æœä¸‰ä¸ªåˆ†é‡éƒ½æ²¡æœ‰ä½¿ç”¨SAO,åˆ™è¿”å›
   {
     return;
   }
 
   bool isLeftAvail, isRightAvail, isAboveAvail, isBelowAvail, isAboveLeftAvail, isAboveRightAvail, isBelowLeftAvail, isBelowRightAvail;
 
-  // block boundary availability£¬»ñÈ¡¿é±ß½çµÄ¿ÉÓÃĞÔ
+  // block boundary availabilityï¼Œè·å–å—è¾¹ç•Œçš„å¯ç”¨æ€§
   //block boundary availability
   deriveLoopFilterBoundaryAvailibility(cs, area.Y(), isLeftAvail,isRightAvail,isAboveAvail,isBelowAvail,isAboveLeftAvail,isAboveRightAvail,isBelowLeftAvail,isBelowRightAvail);
 
@@ -582,11 +582,11 @@ void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& s
   int horVirBndryPosComp[] = { -1,-1,-1 };
   int verVirBndryPosComp[] = { -1,-1,-1 };
   bool isCtuCrossedByVirtualBoundaries = isCrossedByVirtualBoundaries(area.Y().x, area.Y().y, area.Y().width, area.Y().height, numHorVirBndry, numVerVirBndry, horVirBndryPos, verVirBndryPos, cs.picHeader );
-  for(int compIdx = 0; compIdx < numberOfComponents; compIdx++)//±éÀúÈı¸ö·ÖÁ¿
+  for(int compIdx = 0; compIdx < numberOfComponents; compIdx++)//éå†ä¸‰ä¸ªåˆ†é‡
   {
     const ComponentID compID = ComponentID(compIdx);
     const CompArea& compArea = area.block(compID);
-    SAOOffset& ctbOffset     = saoblkParam[compIdx];//½«SAOµÄÏà¹Ø²ÎÊı¸³Öµ¸øctboffset
+    SAOOffset& ctbOffset     = saoblkParam[compIdx];//å°†SAOçš„ç›¸å…³å‚æ•°èµ‹å€¼ç»™ctboffset
 
     if(ctbOffset.modeIdc != SAO_MODE_OFF)
     {
@@ -602,7 +602,7 @@ void SampleAdaptiveOffset::offsetCTU( const UnitArea& area, const CPelUnitBuf& s
       {
         verVirBndryPosComp[i] = (verVirBndryPos[i] >> ::getComponentScaleX(compID, area.chromaFormat)) - compArea.x;
       }
-      //¶Ô¿é½øĞĞ²¹³¥£¬¼´ÔÚÖØ½¨¿éµÄ»ù´¡ÉÏ¼ÓÉÏ²¹³¥Öµ
+      //å¯¹å—è¿›è¡Œè¡¥å¿ï¼Œå³åœ¨é‡å»ºå—çš„åŸºç¡€ä¸ŠåŠ ä¸Šè¡¥å¿å€¼
       offsetBlock( cs.sps->getBitDepth(toChannelType(compID)),
                    cs.slice->clpRng(compID),
                    ctbOffset.typeIdc, ctbOffset.offset

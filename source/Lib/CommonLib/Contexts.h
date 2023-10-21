@@ -96,27 +96,27 @@ public:
   }
   ~BinProbModel_Std ()                {}
 public:
-  void            init              ( int qp, int initId ); // ÉÏÏÂÎÄÄ£ĞÍ³õÊ¼»¯
-  void update(unsigned bin) // µ±Ç°±àÂëbinÖµºÍ¸üĞÂËÙÂÊm_rate¸üĞÂm_state[0], m_state[1]¡£
+  void            init              ( int qp, int initId ); // ä¸Šä¸‹æ–‡æ¨¡å‹åˆå§‹åŒ–
+  void update(unsigned bin) // å½“å‰ç¼–ç binå€¼å’Œæ›´æ–°é€Ÿç‡m_rateæ›´æ–°m_state[0], m_state[1]ã€‚
   {
-    int rate0 = m_rate >> 4; // ¸ß4Î»
-    int rate1 = m_rate & 15; // µÍ4Î»
+    int rate0 = m_rate >> 4; // é«˜4ä½
+    int rate1 = m_rate & 15; // ä½4ä½
 
-    // Ê½1576
+    // å¼1576
     m_state[0] -= (m_state[0] >> rate0) & MASK_0;
     m_state[1] -= (m_state[1] >> rate1) & MASK_1;
     if (bin)
     {
-      m_state[0] += (0x7fffu >> rate0) & MASK_0; // 10±ÈÌØ
-      m_state[1] += (0x7fffu >> rate1) & MASK_1; // 14±ÈÌØ
+      m_state[0] += (0x7fffu >> rate0) & MASK_0; // 10æ¯”ç‰¹
+      m_state[1] += (0x7fffu >> rate1) & MASK_1; // 14æ¯”ç‰¹
     }
   }
-  void setLog2WindowSize(uint8_t log2WindowSize) //¸ù¾İWindowSizeÉèÖÃpstateµÄ¸üĞÂËÙÂÊ
+  void setLog2WindowSize(uint8_t log2WindowSize) //æ ¹æ®WindowSizeè®¾ç½®pstateçš„æ›´æ–°é€Ÿç‡
   {
-    // Ê½1575£¬log2WindowSize¾ÍÊÇshiftIdx
+    // å¼1575ï¼Œlog2WindowSizeå°±æ˜¯shiftIdx
     int rate0 = 2 + ((log2WindowSize >> 2) & 3);
     int rate1 = 3 + rate0 + (log2WindowSize & 3);
-    m_rate    = 16 * rate0 + rate1; // rate0ÊÇ10 ¾«¶ÈµÄ
+    m_rate    = 16 * rate0 + rate1; // rate0æ˜¯10 ç²¾åº¦çš„
     CHECK(rate1 > 9, "Second window size is too large!");
   }
   void estFracBitsUpdate(unsigned bin, uint64_t &b)
@@ -128,15 +128,15 @@ public:
   static uint32_t estFracBitsTrm(unsigned bin) { return (bin ? 0x3bfbb : 0x0010c); }
   BinFracBits     getFracBitsArray() const { return m_binFracBits[state()]; }
 public:
-  uint8_t state() const { return (m_state[0] + m_state[1]) >> 8; } // ±íÊ¾P(1)µÄ¸ÅÂÊ pState
-  uint8_t mps() const { return state() >> 7; } // valMps ·µ»ØMPSµÄÖµ0 or 1
-  uint8_t getLPS(unsigned range) const // ivlLpsRangeÊÇ×îĞ¡¸ÅÂÊ·ûºÅlpsµÄ·¶Î§
+  uint8_t state() const { return (m_state[0] + m_state[1]) >> 8; } // è¡¨ç¤ºP(1)çš„æ¦‚ç‡ pState
+  uint8_t mps() const { return state() >> 7; } // valMps è¿”å›MPSçš„å€¼0 or 1
+  uint8_t getLPS(unsigned range) const // ivlLpsRangeæ˜¯æœ€å°æ¦‚ç‡ç¬¦å·lpsçš„èŒƒå›´
   {
-    // range>>5¶ÔÓ¦µÄÊÇqRangeIdx£¬range¶ÔÓ¦ivlCurrRange
+    // range>>5å¯¹åº”çš„æ˜¯qRangeIdxï¼Œrangeå¯¹åº”ivlCurrRange
     uint16_t q = state();
-    if (q & 0x80) // ¼ì²é×î¸ßÎ»,Èç¹ûÊÇ1ËµÃ÷´óÓÚ128
-      q = q ^ 0xff; // °´Î»Òì»ò£¬½«ËùÓĞÎ»È¡·´
-    return ((q >> 2) * (range >> 5) >> 1) + 4; // Ê½1574
+    if (q & 0x80) // æ£€æŸ¥æœ€é«˜ä½,å¦‚æœæ˜¯1è¯´æ˜å¤§äº128
+      q = q ^ 0xff; // æŒ‰ä½å¼‚æˆ–ï¼Œå°†æ‰€æœ‰ä½å–å
+    return ((q >> 2) * (range >> 5) >> 1) + 4; // å¼1574
   }
   static uint8_t  getRenormBitsLPS  ( unsigned LPS )                    { return    m_RenormTable_32  [LPS>>3]; }
   static uint8_t  getRenormBitsRange( unsigned range )                  { return    1; }

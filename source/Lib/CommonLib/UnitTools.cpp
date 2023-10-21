@@ -632,7 +632,7 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
     const int offset = (int)NUM_LUMA_MODE - 6;
     const int mod = offset + 3;
 
-    // Ä¬ÈÏµÄÇé¿ö
+    // é»˜è®¤çš„æƒ…å†µ
     mpm[0] = PLANAR_IDX;
     mpm[1] = DC_IDX;
     mpm[2] = VER_IDX;
@@ -641,11 +641,11 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
     mpm[5] = VER_IDX + 4;
 
 
-    // Á½ÕßÏàµÈÄ£Ê½ÏàµÈ
+    // ä¸¤è€…ç›¸ç­‰æ¨¡å¼ç›¸ç­‰
     if (leftIntraDir == aboveIntraDir)
     {
       numCand = 1;
-      // Á½¸ö¶¼ÊÇ½Ç¶ÈÄ£Ê½
+      // ä¸¤ä¸ªéƒ½æ˜¯è§’åº¦æ¨¡å¼
       if (leftIntraDir > DC_IDX)
       {
         mpm[0] = PLANAR_IDX;
@@ -656,11 +656,11 @@ int PU::getIntraMPMs( const PredictionUnit &pu, unsigned* mpm, const ChannelType
         mpm[5] = (leftIntraDir % mod) + 2;
       }
     }
-    else   // L!=A Á½ÕßÄ£Ê½²»µÈ
+    else   // L!=A ä¸¤è€…æ¨¡å¼ä¸ç­‰
     {
       numCand            = 2;
       int maxCandModeIdx = mpm[0] > mpm[1] ? 0 : 1;
-      // ¶¼ÊÇ½Ç¶ÈÄ£Ê½
+      // éƒ½æ˜¯è§’åº¦æ¨¡å¼
       if ((leftIntraDir > DC_IDX) && (aboveIntraDir > DC_IDX))
       {
         mpm[0]             = PLANAR_IDX;
@@ -872,7 +872,7 @@ bool PU::addMergeHMVPCand(const CodingStructure &cs, MergeCtx &mrgCtx, const int
 {
   const Slice& slice = *cs.slice;
   MotionInfo miNeighbor;
-  //ÔÚLUTÄÚÕÒ
+  //åœ¨LUTå†…æ‰¾
   auto &lut = ibcFlag ? cs.motionLut.lutIbc : cs.motionLut.lut;
   int num_avai_candInLUT = (int)lut.size();
 
@@ -1065,8 +1065,8 @@ void PU::getIBCMergeCandidates(const PredictionUnit &pu, MergeCtx& mrgCtx, const
       , allCandSolidInAbove
     );
 #else
-    //ÀúÊ·BV
-    //bFound Èç¹û³ß´ç¹»ÁËWeitrue
+    //å†å²BV
+    //bFound å¦‚æœå°ºå¯¸å¤Ÿäº†Weitrue
     bool bFound = addMergeHMVPCand(cs, mrgCtx, mrgCandIdx, maxNumMergeCand, cnt, isAvailableA1, miLeft, isAvailableB1,
                                    miAbove, true, isGt4x4);
 #endif
@@ -1076,7 +1076,7 @@ void PU::getIBCMergeCandidates(const PredictionUnit &pu, MergeCtx& mrgCtx, const
       return;
     }
   }
-  //Ìî0BV
+  //å¡«0BV
     while (cnt < maxNumMergeCand)
     {
       mrgCtx.mvFieldNeighbours[cnt * 2].setMvField(Mv(0, 0), MAX_NUM_REF);
@@ -1141,24 +1141,24 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
   const Position posLT = pu.Y().topLeft();
   const Position posRT = pu.Y().topRight();
   const Position posLB = pu.Y().bottomLeft();
-  MotionInfo miAbove, miLeft, miAboveLeft, miAboveRight, miBelowLeft; // µ±Ç°PU 5¸öÏàÁÚ¿éµÄÔË¶¯ĞÅÏ¢
+  MotionInfo miAbove, miLeft, miAboveLeft, miAboveRight, miBelowLeft; // å½“å‰PU 5ä¸ªç›¸é‚»å—çš„è¿åŠ¨ä¿¡æ¯
 
   // above
   const PredictionUnit *puAbove = cs.getPURestricted(posRT.offset(0, -1), pu, pu.chType);
-  // ¿ÕÓò
+  // ç©ºåŸŸ
   bool isAvailableB1 = puAbove && isDiffMER(pu.lumaPos(), posRT.offset(0, -1), plevel) && pu.cu != puAbove->cu && CU::isInter(*puAbove->cu);
 
   if (isAvailableB1)
   {
-    miAbove = puAbove->getMotionInfo(posRT.offset(0, -1)); // ÔË¶¯ĞÅÏ¢
+    miAbove = puAbove->getMotionInfo(posRT.offset(0, -1)); // è¿åŠ¨ä¿¡æ¯
 
     // get Inter Dir
-    mrgCtx.interDirNeighbours[cnt] = miAbove.interDir; // ¸Ã±äÁ¿±íÊ¾merge listÖĞÒÑºòÑ¡ÏîµÄÊıÄ¿
+    mrgCtx.interDirNeighbours[cnt] = miAbove.interDir; // è¯¥å˜é‡è¡¨ç¤ºmerge listä¸­å·²å€™é€‰é¡¹çš„æ•°ç›®
     mrgCtx.useAltHpelIf[cnt] = miAbove.useAltHpelIf;
     // get Mv from Above 
-    // puAbove->cu->BcwIdx±íÊ¾µ±Ç°PUËùÊôµÄCUÎ¬»¤µÄHMVP±íÖĞºòÑ¡ÊıÄ¿
+    // puAbove->cu->BcwIdxè¡¨ç¤ºå½“å‰PUæ‰€å±çš„CUç»´æŠ¤çš„HMVPè¡¨ä¸­å€™é€‰æ•°ç›®
     mrgCtx.BcwIdx[cnt] = (mrgCtx.interDirNeighbours[cnt] == 3) ? puAbove->cu->BcwIdx : BCW_DEFAULT;
-    // Ê¹ÓÃÇ°Ïò²Î¿¼Ö¡µÄMV
+    // ä½¿ç”¨å‰å‘å‚è€ƒå¸§çš„MV
     mrgCtx.mvFieldNeighbours[cnt << 1].setMvField(miAbove.mv[0], miAbove.refIdx[0]); 
 
 #if GDR_ENABLED
@@ -1172,7 +1172,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
 #endif
     if (slice.isInterB())
     {
-      // Èç¹ûÊÇBÖ¡£¬Ôò»¹ĞèÒª»ñµÃÏàÁÚ¿éºóÏò²Î¿¼Ö¡µÄMV
+      // å¦‚æœæ˜¯Bå¸§ï¼Œåˆ™è¿˜éœ€è¦è·å¾—ç›¸é‚»å—åå‘å‚è€ƒå¸§çš„MV
       mrgCtx.mvFieldNeighbours[(cnt << 1) + 1].setMvField(miAbove.mv[1], miAbove.refIdx[1]);
 #if GDR_ENABLED
       if (isEncodeGdrClean)
@@ -1207,7 +1207,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
   {
     miLeft = puLeft->getMotionInfo(posLB.offset(-1, 0));
 
-    // ÈßÓàĞÔ¼ì²é
+    // å†—ä½™æ€§æ£€æŸ¥
     if (!isAvailableB1 || (miAbove != miLeft))
     {
       // get Inter Dir
@@ -1365,7 +1365,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
     return;
   }
 
-  // above left Ç°ËÄ¸öÏàÁÚ¿éÓÉÒ»¸ö²»¿ÉÓÃ£¬ Ôò¼ÌĞø¼ì²é×óÉÏ½ÇµÄB2¿éÊÇ·ñ¿ÉÓÃ
+  // above left å‰å››ä¸ªç›¸é‚»å—ç”±ä¸€ä¸ªä¸å¯ç”¨ï¼Œ åˆ™ç»§ç»­æ£€æŸ¥å·¦ä¸Šè§’çš„B2å—æ˜¯å¦å¯ç”¨
   if ( cnt < 4 )
   {
     const PredictionUnit *puAboveLeft = cs.getPURestricted( posLT.offset( -1, -1 ), pu, pu.chType );
@@ -1424,7 +1424,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
     return;
   }
 
-  //TMVP Ê±ÓòMVPºòÑ¡ÁĞ±í
+  //TMVP æ—¶åŸŸMVPå€™é€‰åˆ—è¡¨
   if (slice.getPicHeader()->getEnableTMVPFlag() && (pu.lumaSize().width + pu.lumaSize().height > 12))
   {
     //>> MTK colocated-RightBottom
@@ -1438,15 +1438,15 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
     bool posC1inRefPicSolid = true;
 #endif
 
-    Position posC0;//C0Îªµ±Ç°PUµÄÓÒÏÂ·½ÔÙÒÆÎ»(1,1)
-    Position posC1 = pu.Y().center(); // µ±Ç°PUÖĞĞÄ
+    Position posC0;//C0ä¸ºå½“å‰PUçš„å³ä¸‹æ–¹å†ç§»ä½(1,1)
+    Position posC1 = pu.Y().center(); // å½“å‰PUä¸­å¿ƒ
     bool C0Avail = false;
     bool boundaryCond = ((posRB.x + pcv.minCUWidth) < pcv.lumaWidth) && ((posRB.y + pcv.minCUHeight) < pcv.lumaHeight);
-    // »ñµÃµ±Ç°PUËùÔÚµÄ×ÓÍ¼
+    // è·å¾—å½“å‰PUæ‰€åœ¨çš„å­å›¾
     const SubPic& curSubPic = pu.cs->slice->getPPS()->getSubPicFromPos(pu.lumaPos());
     if (curSubPic.getTreatedAsPicFlag())
     {
-      // ÔÚ²»°üÀ¨»·Â·ÄÚÂË²¨²Ù×÷µÄ½âÂë´¦ÀíÖĞ£¬ÊÇ·ñ½«×ÓÍ¼ÊÓÎªÍ¼
+      // åœ¨ä¸åŒ…æ‹¬ç¯è·¯å†…æ»¤æ³¢æ“ä½œçš„è§£ç å¤„ç†ä¸­ï¼Œæ˜¯å¦å°†å­å›¾è§†ä¸ºå›¾
       boundaryCond = ((posRB.x + pcv.minCUWidth) <= curSubPic.getSubPicRight() &&
                       (posRB.y + pcv.minCUHeight) <= curSubPic.getSubPicBottom());
     }
@@ -1463,14 +1463,14 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
     Mv        cColMv;
     int       iRefIdx     = 0;
     int       dir         = 0;
-    unsigned  uiArrayAddr = cnt; // Ê±ÓòËùÔÚµÄMV
-    // Ê±ÓòÍ¬Î»MVÊÇ·ñ¿ÉÓÃ
+    unsigned  uiArrayAddr = cnt; // æ—¶åŸŸæ‰€åœ¨çš„MV
+    // æ—¶åŸŸåŒä½MVæ˜¯å¦å¯ç”¨
     bool      bExistMV    = ( C0Avail && getColocatedMVP(pu, REF_PIC_LIST_0, posC0, cColMv, iRefIdx, false ) )
                               || getColocatedMVP( pu, REF_PIC_LIST_0, posC1, cColMv, iRefIdx, false );
     if (bExistMV)
     {
       dir     |= 1;
-      // mvFieldNeighbours´óĞ¡ÊÇ12
+      // mvFieldNeighbourså¤§å°æ˜¯12
       mrgCtx.mvFieldNeighbours[2 * uiArrayAddr].setMvField(cColMv, iRefIdx);
 #if GDR_ENABLED
       if (isEncodeGdrClean)
@@ -1492,7 +1492,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
 #endif
     }
 
-    // ÊÇBÖ¡µÄÊ±ºò£¬»ñÈ¡Á½¸öMV
+    // æ˜¯Bå¸§çš„æ—¶å€™ï¼Œè·å–ä¸¤ä¸ªMV
     if (slice.isInterB())
     {
       bExistMV = ( C0Avail && getColocatedMVP(pu, REF_PIC_LIST_1, posC0, cColMv, iRefIdx, false ) )
@@ -1547,7 +1547,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
   }
 
   //History MVP
-  // ¼ì²éMergeÁĞ±íÊÇ·ñµ½´ï×î´óÊıÄ¿¼õ1£¬Èç¹ûµ½´ïÔò²»ĞèÒª½øĞĞHMVºòÑ¡
+  // æ£€æŸ¥Mergeåˆ—è¡¨æ˜¯å¦åˆ°è¾¾æœ€å¤§æ•°ç›®å‡1ï¼Œå¦‚æœåˆ°è¾¾åˆ™ä¸éœ€è¦è¿›è¡ŒHMVå€™é€‰
   int maxNumMergeCandMin1 = maxNumMergeCand - 1; 
   if (cnt != maxNumMergeCandMin1)
   {
@@ -1569,9 +1569,9 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
     }
   }
 
-  // ================================³É¶ÔÆ½¾ùºòÑ¡MV==================================
+  // ================================æˆå¯¹å¹³å‡å€™é€‰MV==================================
   // pairwise-average candidates 
-  //Ê¹ÓÃL0µÄmergelistµÚÒ»¸öºÍL1µÄµÚÒ»¸ö½øĞĞÆ½¾ù£¬Èç¹ûÒ»¸ö²»¿ÉÓÃ£¬ÄÇÃ´Ö±½ÓÓÃÄÇ¸ö¿ÉÓÃµÄ ÔÙ½øĞĞÈßÓà¼ì²â
+  //ä½¿ç”¨L0çš„mergelistç¬¬ä¸€ä¸ªå’ŒL1çš„ç¬¬ä¸€ä¸ªè¿›è¡Œå¹³å‡ï¼Œå¦‚æœä¸€ä¸ªä¸å¯ç”¨ï¼Œé‚£ä¹ˆç›´æ¥ç”¨é‚£ä¸ªå¯ç”¨çš„ å†è¿›è¡Œå†—ä½™æ£€æµ‹
   {
     if (cnt > 1 && cnt < maxNumMergeCand)
     {
@@ -1579,13 +1579,13 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
       mrgCtx.mvFieldNeighbours[cnt * 2 + 1].setMvField( Mv( 0, 0 ), NOT_VALID );
       // calculate average MV for L0 and L1 seperately
       unsigned char interDir = 0;
-      // ÉèÖÃÂË²¨Æ÷Ö¸Êı
+      // è®¾ç½®æ»¤æ³¢å™¨æŒ‡æ•°
       mrgCtx.useAltHpelIf[cnt] = (mrgCtx.useAltHpelIf[0] == mrgCtx.useAltHpelIf[1]) ? mrgCtx.useAltHpelIf[0] : false;
 
-      // BÖ¡µÄÊ±ºòÄÜÈ¡ 0 ºÍ 1
+      // Bå¸§çš„æ—¶å€™èƒ½å– 0 å’Œ 1
       for( int refListId = 0; refListId < (slice.isInterB() ? 2 : 1); refListId++ )
       {
-        // Ê¹ÓÃÁĞ±íÖĞ×îÇ°ÃæµÄÁ½¸ö
+        // ä½¿ç”¨åˆ—è¡¨ä¸­æœ€å‰é¢çš„ä¸¤ä¸ª
         const short refIdxI = mrgCtx.mvFieldNeighbours[0 * 2 + refListId].refIdx;
         const short refIdxJ = mrgCtx.mvFieldNeighbours[1 * 2 + refListId].refIdx;
 
@@ -1602,7 +1602,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
         }
 
         interDir += 1 << refListId;
-        // both MVs are valid, average these two MVs Á½¸öMVs¶¼ÓĞĞ§£¬Æ½¾ùÕâÁ½¸öMVs
+        // both MVs are valid, average these two MVs ä¸¤ä¸ªMVséƒ½æœ‰æ•ˆï¼Œå¹³å‡è¿™ä¸¤ä¸ªMVs
         if( (refIdxI != NOT_VALID) && (refIdxJ != NOT_VALID) )
         {
           const Mv& MvI = mrgCtx.mvFieldNeighbours[0 * 2 + refListId].mv;
@@ -1612,7 +1612,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
           Mv avgMv = MvI;
           avgMv += MvJ;
           roundAffineMv(avgMv.hor, avgMv.ver, 1);
-          // ÈôÊÇBÖ¡µÄÊ±ºò»á·Ö±ğ½øĞĞÁ½¸ö·½ÏòµÄÆ½¾ù
+          // è‹¥æ˜¯Bå¸§çš„æ—¶å€™ä¼šåˆ†åˆ«è¿›è¡Œä¸¤ä¸ªæ–¹å‘çš„å¹³å‡
           mrgCtx.mvFieldNeighbours[cnt * 2 + refListId].setMvField( avgMv, refIdxI );
 #if GDR_ENABLED
           // GDR: Pairwise single I,J candidate
@@ -1702,7 +1702,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
       allCandSolidInAbove = true && allCandSolidInAbove;
     }
 #endif
-    // BÖ¡ÔÙ²åÈëÒ»¸öÏàÁÚµÄ
+    // Bå¸§å†æ’å…¥ä¸€ä¸ªç›¸é‚»çš„
     if (slice.isInterB())
     {
       mrgCtx.interDirNeighbours [ uiArrayAddr          ] = 3;
@@ -1736,7 +1736,7 @@ void PU::getInterMergeCandidates( const PredictionUnit &pu, MergeCtx& mrgCtx,
       ++refcnt;
     }
   }
-  // Ò»¹²¶àÉÙ¸öÓĞĞ§µÄ
+  // ä¸€å…±å¤šå°‘ä¸ªæœ‰æ•ˆçš„
   mrgCtx.numValidMergeCand = uiArrayAddr;
 }
 
@@ -1849,11 +1849,11 @@ void PU::getInterMMVDMergeCandidates(const PredictionUnit &pu, MergeCtx& mrgCtx,
     mrgCtx.mmvdValid[k][1] = true;
   }
 #endif 
-  for (k = 0; k < maxNumMergeCand; k++) //±éÀúMergeºòÑ¡ÁĞ±í
+  for (k = 0; k < maxNumMergeCand; k++) //éå†Mergeå€™é€‰åˆ—è¡¨
   {
     if (mrgCtx.mrgTypeNeighbours[k] == MRG_TYPE_DEFAULT_N)
     {
-      // Ö»È¡MRG_TYPE_DEFAULT_NÀàĞÍºòÑ¡Ïî
+      // åªå–MRG_TYPE_DEFAULT_Nç±»å‹å€™é€‰é¡¹
       refIdxList0 = mrgCtx.mvFieldNeighbours[(k << 1)].refIdx;
       refIdxList1 = mrgCtx.mvFieldNeighbours[(k << 1) + 1].refIdx;
 
@@ -1897,7 +1897,7 @@ void PU::getInterMMVDMergeCandidates(const PredictionUnit &pu, MergeCtx& mrgCtx,
 
       currBaseNum++;
 
-      if (currBaseNum == MMVD_BASE_MV_NUM) //Ö»È¡Ç°Á½¸öMV
+      if (currBaseNum == MMVD_BASE_MV_NUM) //åªå–å‰ä¸¤ä¸ªMV
       {
         break;
       }
@@ -2229,7 +2229,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
     return;
   }
 
-  //-- Get Spatial MV ¿ÕÓòMV
+  //-- Get Spatial MV ç©ºåŸŸMV
   Position posLT = pu.Y().topLeft();
   Position posRT = pu.Y().topRight();
   Position posLB = pu.Y().bottomLeft();
@@ -2276,7 +2276,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
     }
   }
 
-  // Ê±ÓòMV
+  // æ—¶åŸŸMV
   if (cs.picHeader->getEnableTMVPFlag() && pInfo->numCand < AMVP_MAX_NUM_CANDS && (pu.lumaSize().width + pu.lumaSize().height > 12))
   {
     // Get Temporal Motion Predictor
@@ -2290,7 +2290,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
     bool C0Avail = false;
     Position posC1 = pu.Y().center();
     Mv cColMv;
-    // ÊÇ·ñ³¬¹ı±ß½ç
+    // æ˜¯å¦è¶…è¿‡è¾¹ç•Œ
     bool boundaryCond = ((posRB.x + pcv.minCUWidth) < pcv.lumaWidth) && ((posRB.y + pcv.minCUHeight) < pcv.lumaHeight);
     const SubPic &curSubPic = pu.cs->slice->getPPS()->getSubPicFromPos(pu.lumaPos());
     if (curSubPic.getTreatedAsPicFlag())
@@ -2332,7 +2332,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
     }
   }
 
-  // »ùÓÚÀúÊ·µÄ¹¹Ôì HMVP
+  // åŸºäºå†å²çš„æ„é€  HMVP
   if (pInfo->numCand < AMVP_MAX_NUM_CANDS)
   {
     const int currRefPOC = cs.slice->getRefPic(eRefPicList, refIdx)->getPOC();
@@ -2343,7 +2343,7 @@ void PU::fillMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const in
   {
     pInfo->numCand = AMVP_MAX_NUM_CANDS;
   }
-  // Ìî³äÁãMV
+  // å¡«å……é›¶MV
   while (pInfo->numCand < AMVP_MAX_NUM_CANDS)
   {
 #if GDR_ENABLED
@@ -2372,7 +2372,7 @@ bool PU::addAffineMVPCandUnscaled( const PredictionUnit &pu, const RefPicList &r
 #if GDR_ENABLED
   const bool isEncodeGdrClean = cs.sps->getGDREnabledFlag() && cs.pcv->isEncoder && ((cs.picHeader->getInGdrInterval() && cs.isClean(pu.Y().topRight(), CHANNEL_TYPE_LUMA)) || (cs.picHeader->getNumVerVirtualBoundaries() == 0));
 #endif
-  switch ( dir )//¸ù¾İÏàÁÚ¿éµÄ·½Ïò²ÎÊıdir,µÃµ½Ö¸¶¨·½ÏòµÄÏàÁÚPUµÄÎ»ÖÃĞÅÏ¢
+  switch ( dir )//æ ¹æ®ç›¸é‚»å—çš„æ–¹å‘å‚æ•°dir,å¾—åˆ°æŒ‡å®šæ–¹å‘çš„ç›¸é‚»PUçš„ä½ç½®ä¿¡æ¯
   {
   case MD_LEFT:
     neibPos = pos.offset( -1, 0 );
@@ -2393,11 +2393,11 @@ bool PU::addAffineMVPCandUnscaled( const PredictionUnit &pu, const RefPicList &r
     break;
   }
 
-  neibPU = cs.getPURestricted( neibPos, pu, pu.chType );//»ñµÃÏàÁÚPU
+  neibPU = cs.getPURestricted( neibPos, pu, pu.chType );//è·å¾—ç›¸é‚»PU
 
   if (neibPU == NULL || !CU::isInter(*neibPU->cu) || !neibPU->cu->affine || neibPU->mergeType != MRG_TYPE_DEFAULT_N)
   {
-    return false;//²»¿ÉÓÃ·µ»Øfalse
+    return false;//ä¸å¯ç”¨è¿”å›false
   }
 
   Mv outputAffineMv[3];
@@ -2410,12 +2410,12 @@ bool PU::addAffineMVPCandUnscaled( const PredictionUnit &pu, const RefPicList &r
 
   const int        currRefPOC = cs.slice->getRefPic( refPicList, refIdx )->getPOC();
   const RefPicList refPicList2nd = (refPicList == REF_PIC_LIST_0) ? REF_PIC_LIST_1 : REF_PIC_LIST_0;
-  //Á½¸ö²Î¿¼Ö¡ÁĞ±í Ò»¸ö²»¿ÉÓÃÔÙÊ¹ÓÃÁíÍâÒ»¸ö
+  //ä¸¤ä¸ªå‚è€ƒå¸§åˆ—è¡¨ ä¸€ä¸ªä¸å¯ç”¨å†ä½¿ç”¨å¦å¤–ä¸€ä¸ª
   for ( int predictorSource = 0; predictorSource < 2; predictorSource++ ) // examine the indicated reference picture list, then if not available, examine the other list.
   {
     const RefPicList eRefPicListIndex = (predictorSource == 0) ? refPicList : refPicList2nd;
     const int        neibRefIdx = neibMi.refIdx[eRefPicListIndex];
-    //Ö»¿¼ÂÇÊ¹ÓÃÏàÍ¬²Î¿¼Ö¡µÄ·ÂÉäCU
+    //åªè€ƒè™‘ä½¿ç”¨ç›¸åŒå‚è€ƒå¸§çš„ä»¿å°„CU
     if ( ((neibPU->interDir & (eRefPicListIndex + 1)) == 0) || pu.cu->slice->getRefPOC( eRefPicListIndex, neibRefIdx ) != currRefPOC )
     {
       continue;
@@ -2432,10 +2432,10 @@ bool PU::addAffineMVPCandUnscaled( const PredictionUnit &pu, const RefPicList &r
       xInheritedAffineMv(pu, neibPU, eRefPicListIndex, outputAffineMv);
     }
 #else
-    //¼Ì³Ğµ±Ç°PUÏàÁÚPUµÄÔË¶¯ĞÅÏ¢
+    //ç»§æ‰¿å½“å‰PUç›¸é‚»PUçš„è¿åŠ¨ä¿¡æ¯
     xInheritedAffineMv( pu, neibPU, eRefPicListIndex, outputAffineMv );
 #endif
-    outputAffineMv[0].roundAffinePrecInternal2Amvr(pu.cu->imv);//µ÷Õû¾«¶È
+    outputAffineMv[0].roundAffinePrecInternal2Amvr(pu.cu->imv);//è°ƒæ•´ç²¾åº¦
     outputAffineMv[1].roundAffinePrecInternal2Amvr(pu.cu->imv);
     affiAMVPInfo.mvCandLT[affiAMVPInfo.numCand] = outputAffineMv[0];
     affiAMVPInfo.mvCandRT[affiAMVPInfo.numCand] = outputAffineMv[1];
@@ -2625,7 +2625,7 @@ void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
   if ( (posNeiY + neiH) % pu.cs->sps->getCTUSize() == 0 && (posNeiY + neiH) == posCurY )
   {
     // use bottom-left and bottom-right sub-block MVs for inheritance
-    //Ê¹ÓÃÏàÁÚPUµÄ×óÏÂºÍÓÒÏÂ¼Ì³Ğ
+    //ä½¿ç”¨ç›¸é‚»PUçš„å·¦ä¸‹å’Œå³ä¸‹ç»§æ‰¿
     const Position posRB = puNeighbour->Y().bottomRight();
     const Position posLB = puNeighbour->Y().bottomLeft();
     mvLT = puNeighbour->getMotionInfo( posLB ).mv[eRefPicList];
@@ -2636,8 +2636,8 @@ void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
 
   int shift = MAX_CU_DEPTH;
   int iDMvHorX, iDMvHorY, iDMvVerX, iDMvVerY;
-  //HorÖ¸µÄÊÇxÇ°µÄÏµÊı XÖ¸µÄÊÇMVx
-  //¸ù¾İ·ÂÉä²ÎÊıÄ£ĞÍ¼ÆËã³öÄ£ĞÍ²ÎÊı  ÕâÀïĞèÒª²Î¿¼V2002Ìá°¸µÄalgorithm descriptionÖ®Ç°µÄÓĞÒ»µãĞ¡´íÎó ÏÂ±ê³ö´í
+  //HoræŒ‡çš„æ˜¯xå‰çš„ç³»æ•° XæŒ‡çš„æ˜¯MVx
+  //æ ¹æ®ä»¿å°„å‚æ•°æ¨¡å‹è®¡ç®—å‡ºæ¨¡å‹å‚æ•°  è¿™é‡Œéœ€è¦å‚è€ƒV2002ææ¡ˆçš„algorithm descriptionä¹‹å‰çš„æœ‰ä¸€ç‚¹å°é”™è¯¯ ä¸‹æ ‡å‡ºé”™
   iDMvHorX = (mvRT - mvLT).getHor() << (shift - floorLog2(neiW));
   iDMvHorY = (mvRT - mvLT).getVer() << (shift - floorLog2(neiW));
   if ( puNeighbour->cu->affineType == AFFINEMODEL_6PARAM && !isTopCtuBoundary )
@@ -2650,14 +2650,14 @@ void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
     iDMvVerX = -iDMvHorY;
     iDMvVerY = iDMvHorX;
   }
-  //Ëõ·Å
+  //ç¼©æ”¾
   int iMvScaleHor = mvLT.getHor() << shift;
   int iMvScaleVer = mvLT.getVer() << shift;
   int horTmp, verTmp;
 
   // v0
-  //Ïàµ±ÓÚÊ¹ÓÃ²îÖµÀ´ÍÆµ¼³öMV
-  //Ê¹ÓÃÊ±»¹ĞèÒª¼ÓÉÏNei¶ÔÓ¦µãµÄMV Ò²¾ÍÊÇiMvScaleHor.Ver
+  //ç›¸å½“äºä½¿ç”¨å·®å€¼æ¥æ¨å¯¼å‡ºMV
+  //ä½¿ç”¨æ—¶è¿˜éœ€è¦åŠ ä¸ŠNeiå¯¹åº”ç‚¹çš„MV ä¹Ÿå°±æ˜¯iMvScaleHor.Ver
   horTmp = iMvScaleHor + iDMvHorX * (posCurX - posNeiX) + iDMvVerX * (posCurY - posNeiY);
   verTmp = iMvScaleVer + iDMvHorY * (posCurX - posNeiX) + iDMvVerY * (posCurY - posNeiY);
   roundAffineMv( horTmp, verTmp, shift );
@@ -2688,7 +2688,7 @@ void PU::xInheritedAffineMv( const PredictionUnit &pu, const PredictionUnit* puN
 
 void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, const int &refIdx, AffineAMVPInfo &affiAMVPInfo)
 {
-  // ³õÊ¼»¯AMVPºòÑ¡ÊıÁ¿
+  // åˆå§‹åŒ–AMVPå€™é€‰æ•°é‡
   affiAMVPInfo.numCand = 0;
 
   if (refIdx < 0)
@@ -2715,8 +2715,8 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
   }
 #endif
   // insert inherited affine candidates
-  //=========================1. ¼Ì³ĞÆäÏàÁÚCUµÄCPMVºòÑ¡Ïî==========================
-  Mv outputAffineMv[3];//±£´æµÄÊÇB2 B1 A1 Èı¸öµãµÄMV
+  //=========================1. ç»§æ‰¿å…¶ç›¸é‚»CUçš„CPMVå€™é€‰é¡¹==========================
+  Mv outputAffineMv[3];//ä¿å­˜çš„æ˜¯B2 B1 A1 ä¸‰ä¸ªç‚¹çš„MV
 #if GDR_ENABLED
   bool     outputAffineMvSolid[3];
   MvpType  outputAffineMvType[3];
@@ -2726,22 +2726,22 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
   Position posRT = pu.Y().topRight();
   Position posLB = pu.Y().bottomLeft();
   /*
-  »ñÈ¡µÚÒ»ÖÖAMVPºòÑ¡ÀàĞÍ£¬¼´ÏàÁÚPUµÄ¿ÉÓÃÔË¶¯ĞÅÏ¢¼Ì³Ğ
-  ÏÂÃæÁ¬ĞøµÄif»ñÈ¡µ±Ç°PUµÄ¿ÉÓÃÏàÁÚ¿éµÄ·ÂÉäÔË¶¯ĞÅÏ¢
-  ¼ì²é¿ÉÓÃĞÔµÄË³ĞòÎª£º
-  1¡¢ÏÈ¼ì²é×ó±ß ¼´×óÏÂ->×ó
-  2¡¢ÔÙ¼ì²éÉÏ·½ ¼´ÓÒÉÏ->ÉÏ->×óÉÏ
+  è·å–ç¬¬ä¸€ç§AMVPå€™é€‰ç±»å‹ï¼Œå³ç›¸é‚»PUçš„å¯ç”¨è¿åŠ¨ä¿¡æ¯ç»§æ‰¿
+  ä¸‹é¢è¿ç»­çš„ifè·å–å½“å‰PUçš„å¯ç”¨ç›¸é‚»å—çš„ä»¿å°„è¿åŠ¨ä¿¡æ¯
+  æ£€æŸ¥å¯ç”¨æ€§çš„é¡ºåºä¸ºï¼š
+  1ã€å…ˆæ£€æŸ¥å·¦è¾¹ å³å·¦ä¸‹->å·¦
+  2ã€å†æ£€æŸ¥ä¸Šæ–¹ å³å³ä¸Š->ä¸Š->å·¦ä¸Š
   */
 
   // check left neighbor 
-  // ÏÈ¼ì²é×óÏÂÏàÁÚCUÊÇ·ñ¿ÉÓÃ£¬Èç¹û¿ÉÓÃ£¬Ôò¼Ì³Ğ×óÏÂÏàÁÚCUµÄCPMVºòÑ¡Ïî£»·ñÔò£¬¼ì²é×ó²àÏàÁÚCUÊÇ·ñ¿ÉÓÃ
-  // ÅĞ¶ÏÏàÁÚ¿éµÄCPMVÊÇ·ñ¿ÉÓÃ£¬ÏàÁÚPU²»´æÔÚ»òÕßÏàÁÚPUÖ¡ÄÚ±àÂë»òÕßÏàÁÚPU²»ÊÇAffineÄ£Ê½£¬Ôò±íÊ¾ÏàÁÚPU²»¿ÉÓÃ
+  // å…ˆæ£€æŸ¥å·¦ä¸‹ç›¸é‚»CUæ˜¯å¦å¯ç”¨ï¼Œå¦‚æœå¯ç”¨ï¼Œåˆ™ç»§æ‰¿å·¦ä¸‹ç›¸é‚»CUçš„CPMVå€™é€‰é¡¹ï¼›å¦åˆ™ï¼Œæ£€æŸ¥å·¦ä¾§ç›¸é‚»CUæ˜¯å¦å¯ç”¨
+  // åˆ¤æ–­ç›¸é‚»å—çš„CPMVæ˜¯å¦å¯ç”¨ï¼Œç›¸é‚»PUä¸å­˜åœ¨æˆ–è€…ç›¸é‚»PUå¸§å†…ç¼–ç æˆ–è€…ç›¸é‚»PUä¸æ˜¯Affineæ¨¡å¼ï¼Œåˆ™è¡¨ç¤ºç›¸é‚»PUä¸å¯ç”¨
   if ( !addAffineMVPCandUnscaled( pu, eRefPicList, refIdx, posLB, MD_BELOW_LEFT, affiAMVPInfo ) )
   {
     addAffineMVPCandUnscaled( pu, eRefPicList, refIdx, posLB, MD_LEFT, affiAMVPInfo );
   }
 
-  // check above neighbor °´Ë³Ğò¼ì²éÓÒÉÏ¡¢ÉÏ²àºÍ×óÉÏÏàÁÚCUÊÇ·ñ¿ÉÓÃ
+  // check above neighbor æŒ‰é¡ºåºæ£€æŸ¥å³ä¸Šã€ä¸Šä¾§å’Œå·¦ä¸Šç›¸é‚»CUæ˜¯å¦å¯ç”¨
   if ( !addAffineMVPCandUnscaled( pu, eRefPicList, refIdx, posRT, MD_ABOVE_RIGHT, affiAMVPInfo ) )
   {
     if ( !addAffineMVPCandUnscaled( pu, eRefPicList, refIdx, posRT, MD_ABOVE, affiAMVPInfo ) )
@@ -2749,7 +2749,7 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
       addAffineMVPCandUnscaled( pu, eRefPicList, refIdx, posLT, MD_ABOVE_LEFT, affiAMVPInfo );
     }
   }
-  // ºòÑ¡ÁĞ±í´óĞ¡Îª2£¬½«ºòÑ¡ÔË¶¯ĞÅÏ¢×ª»»Îª1/16¾«¶È
+  // å€™é€‰åˆ—è¡¨å¤§å°ä¸º2ï¼Œå°†å€™é€‰è¿åŠ¨ä¿¡æ¯è½¬æ¢ä¸º1/16ç²¾åº¦
   if ( affiAMVPInfo.numCand >= AMVP_MAX_NUM_CANDS )
   {
     for (int i = 0; i < affiAMVPInfo.numCand; i++)
@@ -2763,14 +2763,14 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
 
   // insert constructed affine candidates
 
-  //=========================2.	¹¹ÔìAffine AMVPºòÑ¡Ïî===========================
-  // ÏàÁÚCUµÄÆ½ÒÆÔË¶¯MV¹¹½¨CPMV
+  //=========================2.	æ„é€ Affine AMVPå€™é€‰é¡¹===========================
+  // ç›¸é‚»CUçš„å¹³ç§»è¿åŠ¨MVæ„å»ºCPMV
   
   int cornerMVPattern = 0;
 
   //-------------------  V0 (START) -------------------//
-  AMVPInfo amvpInfo0; // ´æ·ÅÆ½ÒÆÔË¶¯Ê¸Á¿
-  amvpInfo0.numCand = 0; // ³õÊ¼»¯ºòÑ¡´óĞ¡
+  AMVPInfo amvpInfo0; // å­˜æ”¾å¹³ç§»è¿åŠ¨çŸ¢é‡
+  amvpInfo0.numCand = 0; // åˆå§‹åŒ–å€™é€‰å¤§å°
 
 #if GDR_ENABLED
   if (isEncodeGdrClean)
@@ -2784,8 +2784,8 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
   }
 #endif
 
-  // A->C: Above Left, Above, Left Ò²¾ÍÊÇ×óÉÏÏñËØµãÏàÁÚµÄ¼¸¸öPU
-  // ×óÉÏ£¬ÉÏ£¬×óË³Ğò
+  // A->C: Above Left, Above, Left ä¹Ÿå°±æ˜¯å·¦ä¸Šåƒç´ ç‚¹ç›¸é‚»çš„å‡ ä¸ªPU
+  // å·¦ä¸Šï¼Œä¸Šï¼Œå·¦é¡ºåº
   addMVPCandUnscaled( pu, eRefPicList, refIdx, posLT, MD_ABOVE_LEFT, amvpInfo0 );
   if ( amvpInfo0.numCand < 1 )
   {
@@ -2813,8 +2813,8 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
   }
 #endif
 
-  // D->E: Above, Above Right ÓÒÉÏÏàÁÚµÄPU
-  // ÉÏ£¬ÓÒÉÏ
+  // D->E: Above, Above Right å³ä¸Šç›¸é‚»çš„PU
+  // ä¸Šï¼Œå³ä¸Š
   addMVPCandUnscaled( pu, eRefPicList, refIdx, posRT, MD_ABOVE, amvpInfo1 );
   if ( amvpInfo1.numCand < 1 )
   {
@@ -2839,15 +2839,15 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
 #endif
 
   // F->G: Left, Below Left
-  // ×ó£¬×óÏÂ
+  // å·¦ï¼Œå·¦ä¸‹
   addMVPCandUnscaled( pu, eRefPicList, refIdx, posLB, MD_LEFT, amvpInfo2 );
   if ( amvpInfo2.numCand < 1 )
   {
     addMVPCandUnscaled( pu, eRefPicList, refIdx, posLB, MD_BELOW_LEFT, amvpInfo2 );
   }
   cornerMVPattern = cornerMVPattern | (amvpInfo2.numCand << 2);
-  // ½«Èı¸öAMVPÆ½ÒÆºòÑ¡ÁĞ±íamvpInfo0¡¢amvpInfo1¡¢amvpInfo2ºòÑ¡´æÈëµ½
-  // ÓÃÓÚ´æ·ÅÏàÁÚ¿éÔË¶¯ĞÅÏ¢µÄMvÊı×éoutputAffineMv[]ÖĞ
+  // å°†ä¸‰ä¸ªAMVPå¹³ç§»å€™é€‰åˆ—è¡¨amvpInfo0ã€amvpInfo1ã€amvpInfo2å€™é€‰å­˜å…¥åˆ°
+  // ç”¨äºå­˜æ”¾ç›¸é‚»å—è¿åŠ¨ä¿¡æ¯çš„Mvæ•°ç»„outputAffineMv[]ä¸­
   outputAffineMv[0] = amvpInfo0.mvCand[0];
   outputAffineMv[1] = amvpInfo1.mvCand[0];
   outputAffineMv[2] = amvpInfo2.mvCand[0];
@@ -2870,13 +2870,13 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
     allCandSolidInAbove = allCandSolidInAbove && outputAffineMvSolid[0] && outputAffineMvSolid[1] && outputAffineMvSolid[2];
   }
 #endif
-  // »»³É1/16µÄÏñËØ¾«¶È
+  // æ¢æˆ1/16çš„åƒç´ ç²¾åº¦
   outputAffineMv[0].roundAffinePrecInternal2Amvr(pu.cu->imv);
   outputAffineMv[1].roundAffinePrecInternal2Amvr(pu.cu->imv);
   outputAffineMv[2].roundAffinePrecInternal2Amvr(pu.cu->imv);
 
-  // ¶ÔÓÚËÄ²ÎÊıAffineÄ£ĞÍ£¬MV0ºÍMV1¾ù¿ÉÓÃÊ±²Å¼ÓÈëºòÑ¡ÁĞ±í£»
-  // ¶ÔÓÚÁù²ÎÊıÄ£ĞÍ£¬µ±Èı¸öCPMV¾ù¿ÉÓÃÊ±£¬²Å¼ÓÈëºòÑ¡ÁĞ±í
+  // å¯¹äºå››å‚æ•°Affineæ¨¡å‹ï¼ŒMV0å’ŒMV1å‡å¯ç”¨æ—¶æ‰åŠ å…¥å€™é€‰åˆ—è¡¨ï¼›
+  // å¯¹äºå…­å‚æ•°æ¨¡å‹ï¼Œå½“ä¸‰ä¸ªCPMVå‡å¯ç”¨æ—¶ï¼Œæ‰åŠ å…¥å€™é€‰åˆ—è¡¨
   if ( cornerMVPattern == 7 || (cornerMVPattern == 3 && pu.cu->affineType == AFFINEMODEL_4PARAM) )
   {
     affiAMVPInfo.mvCandLT[affiAMVPInfo.numCand] = outputAffineMv[0];
@@ -2903,13 +2903,13 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
     affiAMVPInfo.numCand++;
   }
 
-  //µÚÈıÖÖÀàĞÍ£¬Ö±½Ó¼ÓÈë½ÇµãÉÏµÄÈı¸öMV½¨Á¢Æ½ÒÆMV
+  //ç¬¬ä¸‰ç§ç±»å‹ï¼Œç›´æ¥åŠ å…¥è§’ç‚¹ä¸Šçš„ä¸‰ä¸ªMVå»ºç«‹å¹³ç§»MV
   if ( affiAMVPInfo.numCand < 2 )
   {
     // check corner MVs
     for ( int i = 2; i >= 0 && affiAMVPInfo.numCand < AMVP_MAX_NUM_CANDS; i-- )
     {
-      //µÚi¸öMV´æÔÚÊ±£¬½«µÚi¸öMV×÷Îª×óÉÏ¡¢ÓÒÉÏºÍ×óÏÂÈıµãµÄMVºòÑ¡Ïî
+      //ç¬¬iä¸ªMVå­˜åœ¨æ—¶ï¼Œå°†ç¬¬iä¸ªMVä½œä¸ºå·¦ä¸Šã€å³ä¸Šå’Œå·¦ä¸‹ä¸‰ç‚¹çš„MVå€™é€‰é¡¹
       if ( cornerMVPattern & (1 << i) ) // MV i exist
       {
         affiAMVPInfo.mvCandLT[affiAMVPInfo.numCand] = outputAffineMv[i];
@@ -2937,13 +2937,13 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
       }
     }
 
-    // Get Temporal Motion Predictor »ñµÃÍ¬Î»¿éµÄÊ±ÓòMV
-    //Ê±ÓòÉÏµÄÍ¬Î»¿éµÄMV Á½¸ö Ò»¸öÊÇÆ«ÒÆ4 4 ÁíÒ»¸öÊÇÖĞĞÄµã
-    /*¾­¹ıÉÏÊö²½Öè£¬Èç¹ûAffine AMVPÁĞ±í»¹Î´±»ÌîÂú£¬ÔòÌî³äÊ±ÓòºòÑ¡
-    Ìî³äÊ±ÓòºòÑ¡µÄÌõ¼ş£º
-    1¡¢µ±Ç°Affine AMVPºòÑ¡ÁĞ±í³¤¶ÈĞ¡ÓÚ3
-    2¡¢µ±Ç°PUÔÊĞíÊ¹ÓÃÊ±ÓòºòÑ¡
-    »ñÈ¡Ê±ÓòºòÑ¡µÄÔ­Àí£¬¼Ç²»Ì«Çå£¬ËùÒÔ²»×öÏêÏ¸ËµÃ÷
+    // Get Temporal Motion Predictor è·å¾—åŒä½å—çš„æ—¶åŸŸMV
+    //æ—¶åŸŸä¸Šçš„åŒä½å—çš„MV ä¸¤ä¸ª ä¸€ä¸ªæ˜¯åç§»4 4 å¦ä¸€ä¸ªæ˜¯ä¸­å¿ƒç‚¹
+    /*ç»è¿‡ä¸Šè¿°æ­¥éª¤ï¼Œå¦‚æœAffine AMVPåˆ—è¡¨è¿˜æœªè¢«å¡«æ»¡ï¼Œåˆ™å¡«å……æ—¶åŸŸå€™é€‰
+    å¡«å……æ—¶åŸŸå€™é€‰çš„æ¡ä»¶ï¼š
+    1ã€å½“å‰Affine AMVPå€™é€‰åˆ—è¡¨é•¿åº¦å°äº3
+    2ã€å½“å‰PUå…è®¸ä½¿ç”¨æ—¶åŸŸå€™é€‰
+    è·å–æ—¶åŸŸå€™é€‰çš„åŸç†ï¼Œè®°ä¸å¤ªæ¸…ï¼Œæ‰€ä»¥ä¸åšè¯¦ç»†è¯´æ˜
     */
     if ( affiAMVPInfo.numCand < 2 && pu.cs->picHeader->getEnableTMVPFlag() )
     {
@@ -3029,7 +3029,7 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
       }
     }
 
-    //Ê±Óòºó»¹Ã»Âú£¬¼ÓÈë0 MVÌî³ä
+    //æ—¶åŸŸåè¿˜æ²¡æ»¡ï¼ŒåŠ å…¥0 MVå¡«å……
     if ( affiAMVPInfo.numCand < 2 )
     {
       // add zero MV
@@ -3060,7 +3060,7 @@ void PU::fillAffineMvpCand(PredictionUnit &pu, const RefPicList &eRefPicList, co
       }
     }
   }
-  // ×îºó×ª»»¾«¶È
+  // æœ€åè½¬æ¢ç²¾åº¦
   for (int i = 0; i < affiAMVPInfo.numCand; i++)
   {
     affiAMVPInfo.mvCandLT[i].roundAffinePrecInternal2Amvr(pu.cu->imv);
@@ -3117,7 +3117,7 @@ bool PU::addMVPCandUnscaled( const PredictionUnit &pu, const RefPicList &eRefPic
   {
     const RefPicList eRefPicListIndex = ( predictorSource == 0 ) ? eRefPicList : eRefPicList2nd;
     const int        neibRefIdx       = neibMi.refIdx[eRefPicListIndex];
-    //Èç¹ûµ±Ç°CuµÄ²Î¿¼Ö¡ºÍ neiµÄ²Î¿¼Ö¡µÄPOCÏàÍ¬£¬ÄÇÃ´Ö±½ÓÊ¹ÓÃneiµÄmv×÷Îªmv
+    //å¦‚æœå½“å‰Cuçš„å‚è€ƒå¸§å’Œ neiçš„å‚è€ƒå¸§çš„POCç›¸åŒï¼Œé‚£ä¹ˆç›´æ¥ä½¿ç”¨neiçš„mvä½œä¸ºmv
     if( neibRefIdx >= 0 && currRefPOC == cs.slice->getRefPOC( eRefPicListIndex, neibRefIdx ) )
     {
 #if GDR_ENABLED
@@ -3474,12 +3474,12 @@ void PU::getAffineMergeCand( const PredictionUnit &pu, AffineMergeCtx& affMrgCtx
     CHECK( mrgCtx.subPuMvpMiBuf.area() == 0 || !mrgCtx.subPuMvpMiBuf.buf, "Buffer not initialized" );
     mrgCtx.subPuMvpMiBuf.fill( MotionInfo() );
 
-    int pos = 0;//Â¼µ±Ç°CUÏàÁÚCU¿ÉÓÃµÄ¸öÊı£¬ÕâÀïÖ»ÅĞ¶ÏA1Õâ¸öÎ»ÖÃµÄÏàÁÚCU
+    int pos = 0;//å½•å½“å‰CUç›¸é‚»CUå¯ç”¨çš„ä¸ªæ•°ï¼Œè¿™é‡Œåªåˆ¤æ–­A1è¿™ä¸ªä½ç½®çš„ç›¸é‚»CU
     // Get spatial MV
     const Position posCurLB = pu.Y().bottomLeft();
     MotionInfo miLeft;
 
-    //left Ê¹ÓÃA1µÄMV
+    //left ä½¿ç”¨A1çš„MV
     const PredictionUnit* puLeft = cs.getPURestricted( posCurLB.offset( -1, 0 ), pu, pu.chType );
     const bool isAvailableA1 = puLeft && isDiffMER(pu.lumaPos(), posCurLB.offset(-1, 0), plevel) && pu.cu != puLeft->cu && CU::isInter( *puLeft->cu );
     if ( isAvailableA1 )
@@ -3507,12 +3507,12 @@ void PU::getAffineMergeCand( const PredictionUnit &pu, AffineMergeCtx& affMrgCtx
     }
 
     mrgCtx.numValidMergeCand = pos;
-    //ÈçV2002µÄFig29 ²éÕÒA1µÄ½ÇµãMV
+    //å¦‚V2002çš„Fig29 æŸ¥æ‰¾A1çš„è§’ç‚¹MV
     isAvailableSubPu = getInterMergeSubPuMvpCand(pu, mrgCtx, tmpLICFlag, pos, 0);
     if ( isAvailableSubPu )
     {
-      // ½«sbtMVPÄ£Ê½ÖĞµÄÖĞĞÄÎ»ÖÃµÄmvp×÷Îªaffine mergeÁĞ±íÖĞµÄµÚÒ»¸öºòÑ¡mv
-      // 3¸ö¿ØÖÆµã¶¼ÓÃÍ¬Ò»¸ömvÌî³ä
+      // å°†sbtMVPæ¨¡å¼ä¸­çš„ä¸­å¿ƒä½ç½®çš„mvpä½œä¸ºaffine mergeåˆ—è¡¨ä¸­çš„ç¬¬ä¸€ä¸ªå€™é€‰mv
+      // 3ä¸ªæ§åˆ¶ç‚¹éƒ½ç”¨åŒä¸€ä¸ªmvå¡«å……
       for ( int mvNum = 0; mvNum < 3; mvNum++ )
       {
         affMrgCtx.mvFieldNeighbours[(affMrgCtx.numValidMergeCand << 1) + 0][mvNum].setMvField( mrgCtx.mvFieldNeighbours[(pos << 1) + 0].mv, mrgCtx.mvFieldNeighbours[(pos << 1) + 0].refIdx );
@@ -3548,13 +3548,13 @@ void PU::getAffineMergeCand( const PredictionUnit &pu, AffineMergeCtx& affMrgCtx
   {
 
     ///> Start: inherited affine candidates
-    //V2002 fig28µÄÎå¸öÏàÁÚ¿é ¼Ì³Ğ·Ö·ÂÉä¹¹Ôì
+    //V2002 fig28çš„äº”ä¸ªç›¸é‚»å— ç»§æ‰¿åˆ†ä»¿å°„æ„é€ 
     const PredictionUnit* npu[5];
     int numAffNeighLeft = getAvailableAffineNeighboursForLeftPredictor( pu, npu );
     int numAffNeigh = getAvailableAffineNeighboursForAbovePredictor( pu, npu, numAffNeighLeft );
     for ( int idx = 0; idx < numAffNeigh; idx++ )
     {
-      // derive Mv from Neigh affine PU ¼Ì³ĞÏàÁÚ·ÂÉäCUµÄCPMVºòÑ¡Ïî
+      // derive Mv from Neigh affine PU ç»§æ‰¿ç›¸é‚»ä»¿å°„CUçš„CPMVå€™é€‰é¡¹
       Mv cMv[2][3];
 #if GDR_ENABLED
       bool    cMvSolid[2][3] = { {true, true, true}, {true, true, true} };
@@ -3628,7 +3628,7 @@ void PU::getAffineMergeCand( const PredictionUnit &pu, AffineMergeCtx& affMrgCtx
     ///> End: inherited affine candidates
 
     ///> Start: Constructed affine candidates
-    //¹¹½¨ Ê¹ÓÃ°ÑÏàÁÚPUµÄMV×÷Îª²ÎÊı ÏàÁÚCUµÄÆ½ÒÆÔË¶¯MV¹¹ÔìCPMVºòÑ¡Ïî
+    //æ„å»º ä½¿ç”¨æŠŠç›¸é‚»PUçš„MVä½œä¸ºå‚æ•° ç›¸é‚»CUçš„å¹³ç§»è¿åŠ¨MVæ„é€ CPMVå€™é€‰é¡¹
     {
       MotionInfo mi[4];
       bool isAvailable[4] = { false };
@@ -3702,7 +3702,7 @@ void PU::getAffineMergeCand( const PredictionUnit &pu, AffineMergeCtx& affMrgCtx
         }
       }
 
-      // control point: RB ĞéÏß¿ò Ê±ÓòÏàÁÚCUµÄ¹¹ÔìCPMVºòÑ¡Ïî
+      // control point: RB è™šçº¿æ¡† æ—¶åŸŸç›¸é‚»CUçš„æ„é€ CPMVå€™é€‰é¡¹
       if ( slice.getPicHeader()->getEnableTMVPFlag() )
       {
         //>> MTK colocated-RightBottom
@@ -3771,7 +3771,7 @@ void PU::getAffineMergeCand( const PredictionUnit &pu, AffineMergeCtx& affMrgCtx
           }
         }
       }
-      //ÉÏÃæµÃµ½µÄÖØ½¨´æÔÚmiÖĞ
+      //ä¸Šé¢å¾—åˆ°çš„é‡å»ºå­˜åœ¨miä¸­
 
       //-------------------  insert model  -------------------//
       int order[6] = { 0, 1, 2, 3, 4, 5 };
@@ -3796,7 +3796,7 @@ void PU::getAffineMergeCand( const PredictionUnit &pu, AffineMergeCtx& affMrgCtx
         miSolid[0] && miSolid[2]
       };
 #endif
-      // ¶ÔÓÚÁù²ÎÊıÄ£ĞÍ£¬Ê¹ÓÃÇ°ËÄ¸ö3¸öµÄCPMV×éºÏ£»¶ÔÓÚËÄ²ÎÊıÄ£ĞÍ£¬Ê¹ÓÃºóÁ½¸öCPMV×éºÏ
+      // å¯¹äºå…­å‚æ•°æ¨¡å‹ï¼Œä½¿ç”¨å‰å››ä¸ª3ä¸ªçš„CPMVç»„åˆï¼›å¯¹äºå››å‚æ•°æ¨¡å‹ï¼Œä½¿ç”¨åä¸¤ä¸ªCPMVç»„åˆ
       int verNum[6] = { 3, 3, 3, 3, 2, 2 };
       int startIdx = pu.cs->sps->getUseAffineType() ? 0 : 4;
       for ( int idx = startIdx; idx < modelNum; idx++ )
@@ -3805,7 +3805,7 @@ void PU::getAffineMergeCand( const PredictionUnit &pu, AffineMergeCtx& affMrgCtx
 #if GDR_ENABLED
         int affinNumValidCand = affMrgCtx.numValidMergeCand;
 #endif
-        //Ê¹ÓÃÁùÖÖÇé¿öµÃµ½¹¹½¨·ÂÉä²ÎÊı
+        //ä½¿ç”¨å…­ç§æƒ…å†µå¾—åˆ°æ„å»ºä»¿å°„å‚æ•°
         getAffineControlPointCand(pu, mi, isAvailable, model[modelIdx], ((modelIdx == 3) ? neighBcw[1] : neighBcw[0]), modelIdx, verNum[modelIdx], affMrgCtx);
 #if GDR_ENABLED
         if (isEncodeGdrClean)
@@ -3832,7 +3832,7 @@ void PU::getAffineMergeCand( const PredictionUnit &pu, AffineMergeCtx& affMrgCtx
     ///> End: Constructed affine candidates
   }
 
-  ///> zero padding Ìî³ä0 MV
+  ///> zero padding å¡«å……0 MV
   int cnt = affMrgCtx.numValidMergeCand;
   while ( cnt < maxNumAffineMergeCand )
   {
@@ -4061,7 +4061,7 @@ bool PU::getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx& mrgCtx, b
   centerPos = Position{ PosType(centerPos.x & mask), PosType(centerPos.y & mask) };
 
   // derivation of center motion parameters from the collocated CU
-  //Í¬Î»¿éµÄÖĞ¼äÎ»ÖÃ 
+  //åŒä½å—çš„ä¸­é—´ä½ç½® 
   const MotionInfo &mi = pColPic->cs->getMotionInfo(centerPos);
 
   if (mi.isInter && mi.isIBCmot == false)
@@ -4107,7 +4107,7 @@ bool PU::getInterMergeSubPuMvpCand(const PredictionUnit &pu, MergeCtx& mrgCtx, b
     MotionBuf &mb = mrgCtx.subPuMvpMiBuf;
 
     const bool isBiPred = isBipredRestriction(pu);
-    //µÃµ½¸÷¸ö×Ó¿éµÄÍ¬Î»MVP
+    //å¾—åˆ°å„ä¸ªå­å—çš„åŒä½MVP
     for (int y = puPos.y; y < puPos.y + puSize.height; y += puHeight)
     {
       for (int x = puPos.x; x < puPos.x + puSize.width; x += puWidth)
@@ -4378,14 +4378,14 @@ void PU::getGeoMergeCandidates( const PredictionUnit &pu, MergeCtx& geoMrgCtx )
     geoMrgCtx.useAltHpelIf[i] = false;
   }
 
-  PU::getInterMergeCandidates(pu, tmpMergeCtx, 0);//´ÓÏàÁÚµÄcu»ñÈ¡ºòÑ¡ÁĞ±í
-  //±éÀúMergeÁĞ±í
+  PU::getInterMergeCandidates(pu, tmpMergeCtx, 0);//ä»ç›¸é‚»çš„cuè·å–å€™é€‰åˆ—è¡¨
+  //éå†Mergeåˆ—è¡¨
   for (int32_t i = 0; i < maxNumMergeCand; i++)
   {
-    //Èç¹ûiÎªÆæÊı£¬ÄÇÃ´L1²Î¿¼Ö¡µÄmerge candµÄµÚi¸ö×÷Îª GEOµÄµÚi¸ö
-    //Èç¹ûiÎªÅ¼Êı£¬ÄÇÃ´´ÓL0ÖĞ
+    //å¦‚æœiä¸ºå¥‡æ•°ï¼Œé‚£ä¹ˆL1å‚è€ƒå¸§çš„merge candçš„ç¬¬iä¸ªä½œä¸º GEOçš„ç¬¬iä¸ª
+    //å¦‚æœiä¸ºå¶æ•°ï¼Œé‚£ä¹ˆä»L0ä¸­
     int parity = i & 1;
-    // interDirNeighbours ´óĞ¡Îª12
+    // interDirNeighbours å¤§å°ä¸º12
     if( tmpMergeCtx.interDirNeighbours[i] & (0x01 + parity) )
     {
       geoMrgCtx.interDirNeighbours[geoMrgCtx.numValidMergeCand] = 1 + parity;

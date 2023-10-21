@@ -553,7 +553,7 @@ bool TComHash::getBlockHashValue(const PelUnitBuf &curPicBuf, int width, int hei
 
   unsigned char* p = new unsigned char[length];
   uint32_t toHash[4];
-  //°ÑÒ»¸ö¿é·ÖÎªËÄ¸ö×Ó¿é
+  //æŠŠä¸€ä¸ªå—åˆ†ä¸ºå››ä¸ªå­å—
   int block2x2Num = (width*height) >> 2;
 
   uint32_t* hashValueBuffer[2][2];
@@ -573,9 +573,9 @@ bool TComHash::getBlockHashValue(const PelUnitBuf &curPicBuf, int width, int hei
     for (int xPos = 0; xPos < width; xPos += 2)
     {
       int pos = (yPos >> 1)*subBlockInWidth + (xPos >> 1);
-      //°Ñ2¡Á2µÄ¿éµÄÏñËØÖµ±äÎªÒ»¸öÒ»Î¬Êı×é p
+      //æŠŠ2Ã—2çš„å—çš„åƒç´ å€¼å˜ä¸ºä¸€ä¸ªä¸€ç»´æ•°ç»„ p
       TComHash::getPixelsIn1DCharArrayByBlock2x2(curPicBuf, p, xStart + xPos, yStart + yPos, bitDepths, includeChroma);
-      //Ê¹ÓÃpµÃµ½Á½ÖÖ24Î»CRCµÄhashÖµ
+      //ä½¿ç”¨på¾—åˆ°ä¸¤ç§24ä½CRCçš„hashå€¼
       hashValueBuffer[0][0][pos] = TComHash::getCRCValue1(p, length * sizeof(unsigned char));
       hashValueBuffer[1][0][pos] = TComHash::getCRCValue2(p, length * sizeof(unsigned char));
     }
@@ -625,7 +625,7 @@ bool TComHash::getBlockHashValue(const PelUnitBuf &curPicBuf, int width, int hei
     subBlockInHeight >>= 1;
   }
 
-  if (width != height)//currently support 1:2 or 2:1 block sizeÈç¹ûÂú×ã1:2µÄ¹ØÏµ ÄÇÃ´Ö±½ÓÊ¹ÓÃÁ½¸ö×Ó¿éÇóHash
+  if (width != height)//currently support 1:2 or 2:1 block sizeå¦‚æœæ»¡è¶³1:2çš„å…³ç³» é‚£ä¹ˆç›´æ¥ä½¿ç”¨ä¸¤ä¸ªå­å—æ±‚Hash
   {
     CHECK(width != (height << 1) && (width << 1) != height, "Wrong")
     bool isHorizontal = width == (height << 1) ? true : false;

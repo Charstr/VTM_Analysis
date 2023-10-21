@@ -287,8 +287,8 @@ class  CodingStructure;
 
 struct CodingUnit : public UnitArea
 {
-  CodingStructure *cs; //ËùÊôCS
-  Slice *slice;//ËùÊôSLICE
+  CodingStructure *cs; //æ‰€å±CS
+  Slice *slice;//æ‰€å±SLICE
   ChannelType    chType;
 
   PredMode       predMode;
@@ -300,19 +300,19 @@ struct CodingUnit : public UnitArea
   uint8_t          mtDepth; // the actual number of splits after switching to mtt (equals btDepth if only binary splits are allowed)
   int8_t          chromaQpAdj;
   int8_t          qp;
-  SplitSeries    splitSeries;//64Î»³¤ÕûÊı£¬¼ÇÂ¼ctu»®·ÖÊ÷»®·Öµ½cuÊ±µÄ¸÷¸ödepthµÄ»®·ÖÄ£Ê½
+  SplitSeries    splitSeries;//64ä½é•¿æ•´æ•°ï¼Œè®°å½•ctuåˆ’åˆ†æ ‘åˆ’åˆ†åˆ°cuæ—¶çš„å„ä¸ªdepthçš„åˆ’åˆ†æ¨¡å¼
   TreeType       treeType;
   ModeType       modeType;
   ModeTypeSeries modeTypeSeries;
   bool           skip;
-  bool           mmvdSkip;//mmvdÄ£Ê½flag
-  bool           affine;//affineÄ£Ê½flag
-  int            affineType;//affineÄ£Ê½ÀàĞÍ£¬4/6²ÎÊı
+  bool           mmvdSkip;//mmvdæ¨¡å¼flag
+  bool           affine;//affineæ¨¡å¼flag
+  int            affineType;//affineæ¨¡å¼ç±»å‹ï¼Œ4/6å‚æ•°
   bool           colorTransform;
-  bool           geoFlag;//¼¸ºÎ»®·Ö±êÖ¾
+  bool           geoFlag;//å‡ ä½•åˆ’åˆ†æ ‡å¿—
   int            bdpcmMode;
   int            bdpcmModeChroma;
-  uint8_t          imv;//ÕûÊımv
+  uint8_t          imv;//æ•´æ•°mv
   bool           rootCbf;
   uint8_t        sbtInfo;
   uint32_t           tileIdx;
@@ -342,11 +342,11 @@ struct CodingUnit : public UnitArea
 
   void initData();
 
-  unsigned    idx;//cu´æ´¢ÔÚcsÖĞµÄcusÊı×éÖĞµÄidx
+  unsigned    idx;//cuå­˜å‚¨åœ¨csä¸­çš„cusæ•°ç»„ä¸­çš„idx
   CodingUnit *next;
 
-  PredictionUnit *firstPU;   // cu»á¼ÇÂ¼ËüµÄpuºÍtu
-  PredictionUnit *lastPU;//cuµÄpuºÍtuÊÇcs.pusºÍcs.tusµÄÒ»¶Î
+  PredictionUnit *firstPU;   // cuä¼šè®°å½•å®ƒçš„puå’Œtu
+  PredictionUnit *lastPU;//cuçš„puå’Œtuæ˜¯cs.puså’Œcs.tusçš„ä¸€æ®µ
 
   TransformUnit *firstTU;
   TransformUnit *lastTU;
@@ -368,26 +368,26 @@ struct CodingUnit : public UnitArea
 // prediction unit
 // ---------------------------------------------------------------------------
 
-struct IntraPredictionData //Ö¡ÄÚÔ¤²âÊı¾İ
+struct IntraPredictionData //å¸§å†…é¢„æµ‹æ•°æ®
 {
-  uint32_t  intraDir[MAX_NUM_CHANNEL_TYPE];//Ö¡ÄÚÔ¤²âÁÁ¶ÈºÍÉ«¶ÈÄ£Ê½
+  uint32_t  intraDir[MAX_NUM_CHANNEL_TYPE];//å¸§å†…é¢„æµ‹äº®åº¦å’Œè‰²åº¦æ¨¡å¼
   bool      mipTransposedFlag;
-  int       multiRefIdx;//Ö¡ÄÚMRLÄ£Ê½µÄmultiRefIdx
+  int       multiRefIdx;//å¸§å†…MRLæ¨¡å¼çš„multiRefIdx
 };
 
-struct InterPredictionData //Ö¡¼äÔ¤²âÊı¾İ
+struct InterPredictionData //å¸§é—´é¢„æµ‹æ•°æ®
 {
-  bool      mergeFlag;//ÊÇ·ñmerge
+  bool      mergeFlag;//æ˜¯å¦merge
   bool      regularMergeFlag;
   uint8_t     mergeIdx;//mergeidx
   uint8_t     geoSplitDir;
   uint8_t     geoMergeIdx0;
   uint8_t     geoMergeIdx1;
-  bool           mmvdMergeFlag;//mmvdÄ£Ê½flag
-  uint32_t       mmvdMergeIdx;//mmvdÄ£Ê½µÄmergeidx
-  uint8_t     interDir;//Ö¡¼äÔ¤²â·½Ïò£º1-Ç°Ïò¡¢2-ºóÏò¡¢3-Ë«Ïò
-  uint8_t     mvpIdx  [NUM_REF_PIC_LIST_01];//mvpÔÚAMVPÁĞ±íÖĞµÄidx
-  uint8_t     mvpNum  [NUM_REF_PIC_LIST_01];//AMVPÁĞ±íÖĞmvpÊıÄ¿
+  bool           mmvdMergeFlag;//mmvdæ¨¡å¼flag
+  uint32_t       mmvdMergeIdx;//mmvdæ¨¡å¼çš„mergeidx
+  uint8_t     interDir;//å¸§é—´é¢„æµ‹æ–¹å‘ï¼š1-å‰å‘ã€2-åå‘ã€3-åŒå‘
+  uint8_t     mvpIdx  [NUM_REF_PIC_LIST_01];//mvpåœ¨AMVPåˆ—è¡¨ä¸­çš„idx
+  uint8_t     mvpNum  [NUM_REF_PIC_LIST_01];//AMVPåˆ—è¡¨ä¸­mvpæ•°ç›®
   Mv        mvd     [NUM_REF_PIC_LIST_01];//mvd
   Mv        mv      [NUM_REF_PIC_LIST_01];//mv=mvp+mvd
 #if GDR_ENABLED 
@@ -397,19 +397,19 @@ struct InterPredictionData //Ö¡¼äÔ¤²âÊı¾İ
   MvpType   mvpType[NUM_REF_PIC_LIST_01];
   Position  mvpPos[NUM_REF_PIC_LIST_01];
 #endif
-  int16_t     refIdx  [NUM_REF_PIC_LIST_01];//²Î¿¼Ö¡
+  int16_t     refIdx  [NUM_REF_PIC_LIST_01];//å‚è€ƒå¸§
   MergeType mergeType;
   bool      mvRefine;
   Mv        mvdL0SubPu[MAX_NUM_SUBCU_DMVR];
-  Mv        mvdAffi [NUM_REF_PIC_LIST_01][3];//AffineÄ£Ê½¸÷¿ØÖÆµãµÄmvd
-  Mv        mvAffi[NUM_REF_PIC_LIST_01][3];//AffineÄ£Ê½¸÷¿ØÖÆµãµÄmv
+  Mv        mvdAffi [NUM_REF_PIC_LIST_01][3];//Affineæ¨¡å¼å„æ§åˆ¶ç‚¹çš„mvd
+  Mv        mvAffi[NUM_REF_PIC_LIST_01][3];//Affineæ¨¡å¼å„æ§åˆ¶ç‚¹çš„mv
 #if GDR_ENABLED
   bool      mvAffiSolid[NUM_REF_PIC_LIST_01][3];
   bool      mvAffiValid[NUM_REF_PIC_LIST_01][3];
   MvpType   mvAffiType[NUM_REF_PIC_LIST_01][3];
   Position  mvAffiPos[NUM_REF_PIC_LIST_01][3];
 #endif
-  bool      ciipFlag;//CIIPÄ£Ê½flag
+  bool      ciipFlag;//CIIPæ¨¡å¼flag
 
   Mv        bv;                             // block vector for IBC
   Mv        bvd;                            // block vector difference for IBC
@@ -418,8 +418,8 @@ struct InterPredictionData //Ö¡¼äÔ¤²âÊı¾İ
 
 struct PredictionUnit : public UnitArea, public IntraPredictionData, public InterPredictionData
 {
-  CodingUnit      *cu;//puËùÊôµÄcu
-  CodingStructure *cs;//puËùÊôµÄcs
+  CodingUnit      *cu;//puæ‰€å±çš„cu
+  CodingStructure *cs;//puæ‰€å±çš„cs
   ChannelType      chType;
 
   // constructors
@@ -434,9 +434,9 @@ struct PredictionUnit : public UnitArea, public IntraPredictionData, public Inte
   PredictionUnit& operator=(const PredictionUnit& other);
   PredictionUnit& operator=(const MotionInfo& mi);
 
-  unsigned        idx;//pu´æ´¢ÔÚcsÖĞµÄpusÊı×éÖĞµÄidx
+  unsigned        idx;//puå­˜å‚¨åœ¨csä¸­çš„pusæ•°ç»„ä¸­çš„idx
 
-  PredictionUnit *next;//cs.pusÖĞÖ¸ÏòÏÂÒ»¸öpu
+  PredictionUnit *next;//cs.pusä¸­æŒ‡å‘ä¸‹ä¸€ä¸ªpu
 
   // for accessing motion information, which can have higher resolution than PUs (should always be used, when accessing neighboring motion information)
   const MotionInfo& getMotionInfo() const;
@@ -451,16 +451,16 @@ struct PredictionUnit : public UnitArea, public IntraPredictionData, public Inte
 
 struct TransformUnit : public UnitArea
 {
-  CodingUnit      *cu;//tuËùÊôµÄcu
+  CodingUnit      *cu;//tuæ‰€å±çš„cu
   CodingStructure *cs;
   ChannelType      chType;
   int              m_chromaResScaleInv;
 
-  uint8_t        depth;//tuÈç¹û½øĞĞ»®·ÖÊ±µÄÉî¶È
+  uint8_t        depth;//tuå¦‚æœè¿›è¡Œåˆ’åˆ†æ—¶çš„æ·±åº¦
   uint8_t        mtsIdx     [ MAX_NUM_TBLOCKS ];
   bool           noResidual;
   uint8_t        jointCbCr;
-  uint8_t        cbf        [ MAX_NUM_TBLOCKS ];//tuÊÇ·ñÒÑ¾­¾­¹ı±ä»»Á¿»¯
+  uint8_t        cbf        [ MAX_NUM_TBLOCKS ];//tuæ˜¯å¦å·²ç»ç»è¿‡å˜æ¢é‡åŒ–
 
   TransformUnit() : chType( CH_L ) { }
   TransformUnit(const UnitArea& unit);

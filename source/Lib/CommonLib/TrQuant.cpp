@@ -621,9 +621,9 @@ std::vector<int> TrQuant::selectICTCandidates( const TransformUnit &tu, CompStor
 
 void TrQuant::getTrTypes(const TransformUnit tu, const ComponentID compID, int &trTypeHor, int &trTypeVer)
 {
-  // ÊÇ·ñÊÇÏÔÊ½µÄMTS 
+  // æ˜¯å¦æ˜¯æ˜¾å¼çš„MTS 
   const bool isExplicitMTS = (CU::isIntra(*tu.cu) ? tu.cs->sps->getUseIntraMTS() : tu.cs->sps->getUseInterMTS() && CU::isInter(*tu.cu)) && isLuma(compID);
-  // ÊÇ·ñÊÇÒşÊ½µÄMTS
+  // æ˜¯å¦æ˜¯éšå¼çš„MTS
   const bool isImplicitMTS = CU::isIntra(*tu.cu) && tu.cs->sps->getUseImplicitMTS() && isLuma(compID) && tu.cu->lfnstIdx == 0 && tu.cu->mipFlag == 0;
   const bool isISP = CU::isIntra(*tu.cu) && tu.cu->ispMode && isLuma(compID);
   const bool isSBT = CU::isInter(*tu.cu) && tu.cu->sbtInfo && isLuma(compID);
@@ -897,8 +897,8 @@ void TrQuant::xQuant(TransformUnit &tu, const ComponentID &compID, const CCoeffB
 }
 
 /*
-Í¨¹ı±È½ÏDCT-2µÄSADºÍTransformSkipµÄSAD¾ö¶¨ÊÇ·ñÊ¹ÓÃTransFormSkip,Ö»ÓĞ³ß´çĞ¡ÓÚµÈÓÚ32²Åµ÷ÓÃ
-trModesÊı×é´æÓĞ¶àºË±ä»»µÄË÷ÒıMTSIdxºÍÄÜ·ñ½øĞĞ²ÎÓëºóĞø±È½Ï(int,bool)£¬¾­¹ı±¾º¯ÊıºóĞŞ¸ÄMTSIdx¶ÔÓ¦µÄboolÖµ
+é€šè¿‡æ¯”è¾ƒDCT-2çš„SADå’ŒTransformSkipçš„SADå†³å®šæ˜¯å¦ä½¿ç”¨TransFormSkip,åªæœ‰å°ºå¯¸å°äºç­‰äº32æ‰è°ƒç”¨
+trModesæ•°ç»„å­˜æœ‰å¤šæ ¸å˜æ¢çš„ç´¢å¼•MTSIdxå’Œèƒ½å¦è¿›è¡Œå‚ä¸åç»­æ¯”è¾ƒ(int,bool)ï¼Œç»è¿‡æœ¬å‡½æ•°åä¿®æ”¹MTSIdxå¯¹åº”çš„boolå€¼
 */
 void TrQuant::transformNxN( TransformUnit& tu, const ComponentID& compID, const QpParam& cQP, std::vector<TrMode>* trModes, const int maxCand )
 {
@@ -919,7 +919,7 @@ void TrQuant::transformNxN( TransformUnit& tu, const ComponentID& compID, const 
   {
     tu.mtsIdx[compID] = it->first;
     CoeffBuf tempCoeff( m_mtsCoeffs[tu.mtsIdx[compID]], rect);
-    // Èç¹ûÃ»ÓĞ²Ğ²î£¬Ìø¹ı
+    // å¦‚æœæ²¡æœ‰æ®‹å·®ï¼Œè·³è¿‡
     if( tu.noResidual )
     {
       int sumAbs = 0;

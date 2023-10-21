@@ -121,19 +121,19 @@ const BinFracBits ProbModelTables::m_binFracBits[256] = {
   { { 0x318a9, 0x0028b } }, { { 0x356cb, 0x001d0 } }, { { 0x3b520, 0x00116 } }, { { 0x48000, 0x0005c } },
 };
 /*
-�������Ľ�ģ�ĳ�ʼ���У�ȷ��initValue��ֵ�󣬻�������ֵ�Լ�QP��ֵ�����������ʲ���iPA��iPB��VTM4.0�в����˲���˫���ڼ�����ʹ�������������ĸ��ʲ���iPA
-��iPB ����ʾ���ʵĹ���ֵ��������������2^15(32153)����������[0,1] ��չ,
-���������б�ʾ�����⻹ȷ����һ������������ģ�͸��ʸ����ٶȵĲ���M 
+在上下文建模的初始化中，确定initValue的值后，会根据这个值以及QP的值计算两个概率参数iPA和iPB。VTM4.0中采用了并行双窗口技术，使用了两个独立的概率参数iPA
+和iPB ，表示概率的估计值。这两个参数以2^15(32153)将概率区间[0,1] 扩展,
+以整数进行表示。此外还确定了一个控制上下文模型概率更新速度的参数M 
 */
 void BinProbModel_Std::init( int qp, int initId )
 {
-  int slope = (initId >> 3) - 4; // ʽ1511-1512
-  int offset = ((initId & 7) * 18) + 1;// ʽ1511-1512
+  int slope = (initId >> 3) - 4; // 式1511-1512
+  int offset = ((initId & 7) * 18) + 1;// 式1511-1512
   int inistate = ((slope   * (qp - 16)) >> 1) + offset;
-  int state_clip = inistate < 1 ? 1 : inistate > 127 ? 127 : inistate; // ʽ1513
+  int state_clip = inistate < 1 ? 1 : inistate > 127 ? 127 : inistate; // 式1513
   const int p1 = (state_clip << 8);
-  m_state[0]   = p1 & MASK_0; //  ʽ1514   ȡ��10λ
-  m_state[1]   = p1 & MASK_1; // ��14λ��
+  m_state[0]   = p1 & MASK_0; //  式1514   取低10位
+  m_state[1]   = p1 & MASK_1; // 低14位。
 }
 
 CtxSet::CtxSet( std::initializer_list<CtxSet> ctxSets )
@@ -190,11 +190,11 @@ const CtxSet ContextSetCfg::SplitFlag = ContextSetCfg::addCtxSet
   {  12,  13,   8,   8,  13,  12,   5,   9,   9, },
 });
 /*
-������ģ���д洢��ֵ��initValue,���ֵ��0��1�ĸ��ʴ�Сp(0)��p(1)�йء�������ģ�͵�ѡ�����ѡ����ʵ�initValue��initValue��ֵ��slice�������Լ��ѱ�����﷨Ԫ���йء�
-��Щ������Ϊ������ �ѱ��������Ϣ��Ϊ�����ġ���splitQtflagΪ���������Ǵ��splitQtflag��initValueֵ�ı���
-�ñ���ĺ�������slice�������йأ�B��P��I�ֱ��Ӧ��0��1��2�С��ñ����������ȡֵ�����ѱ������ ��ǰCU����ߺ��ϱߵ�CU��splitQtflag�йأ��������Ͽ鶼���ڼ�������ʱȡ��0�У�
-�������������Ͽ鲻�ٻ���ʱȡ��1�У��������Ͽ鶼��������ʱȡ��2�С����⣬��uiDepth < ucMinDepthʱ ȡ��3 �У���uiDepth >= ucMaxDepth + 1ʱȡ��4�С�
-ѡȡ��initValueֵ��λ����ctxIdx��ʶ��ÿһ ��initValueֵ����Ӧһ��ctxIdx�š��﷨Ԫ��ctxIdx��Ϊ������������ÿһ��ģ�Ͷ��ܹ���Ψһ������ �ű�ע��
+上下文模型中存储的值是initValue,这个值与0和1的概率大小p(0)和p(1)有关。上下文模型的选择就是选择合适的initValue，initValue的值与slice的类型以及已编码的语法元素有关。
+这些用来作为条件的 已编码符号信息称为上下文。以splitQtflag为例，下面是存放splitQtflag的initValue值的表格。
+该表格的横坐标与slice的类型有关，B、P、I分别对应第0、1、2行。该表格纵坐标的取值，与已编码过的 当前CU的左边和上边的CU的splitQtflag有关：当左块和上块都不在继续划分时取第0列；
+当左块继续划分上块不再划分时取第1列；当左块和上块都继续划分时取第2列。另外，当uiDepth < ucMinDepth时 取第3 列；当uiDepth >= ucMaxDepth + 1时取第4列。
+选取的initValue值的位置以ctxIdx标识，每一 个initValue值都对应一个ctxIdx号。语法元素ctxIdx称为上下文索引，每一个模型都能够由唯一的索引 号标注。
 */
 const CtxSet ContextSetCfg::SplitQtFlag = ContextSetCfg::addCtxSet
 ({

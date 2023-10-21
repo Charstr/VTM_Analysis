@@ -182,7 +182,7 @@ Pel IntraPrediction::xGetPredValDc( const CPelBuf &pSrc, const Size &dstSize )
 
 int IntraPrediction::getModifiedWideAngle( int width, int height, int predMode )
 {
-  // //²ÉÓÃÄ£Ê½±àºÅ-14~-1£¬67~80±íÊ¾¿í½Ç¶ÈÔ¤²âÄ£Ê½
+  // //é‡‡ç”¨æ¨¡å¼ç¼–å·-14~-1ï¼Œ67~80è¡¨ç¤ºå®½è§’åº¦é¢„æµ‹æ¨¡å¼
   //The function returns a 'modified' wide angle index, given that it is not necessary
   //in this software implementation to reserve the values 0 and 1 for Planar and DC to generate the prediction signal.
   //It should only be used to obtain the intraPredAngle parameter.
@@ -190,13 +190,13 @@ int IntraPrediction::getModifiedWideAngle( int width, int height, int predMode )
   if ( predMode > DC_IDX && predMode <= VDIA_IDX )
   {
     int modeShift[] = { 0, 6, 10, 12, 14, 15 };
-    int deltaSize = abs(floorLog2(width) - floorLog2(height)); // ÊÇ·ñ¿í½Ç¶È
-    // ³¤
+    int deltaSize = abs(floorLog2(width) - floorLog2(height)); // æ˜¯å¦å®½è§’åº¦
+    // é•¿
     if (width > height && predMode < 2 + modeShift[deltaSize]) // 2 8 12 14 16
     {
       predMode += (VDIA_IDX - 1); // 65
     }
-    else if (height > width && predMode > VDIA_IDX - modeShift[deltaSize]) // ¸ß 66 60 56 54 52
+    else if (height > width && predMode > VDIA_IDX - modeShift[deltaSize]) // é«˜ 66 60 56 54 52
     {
       predMode -= (VDIA_IDX - 1); // 65
     }
@@ -222,7 +222,7 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
   const int            iHeight      = piPred.height;
   CHECK(iWidth == 2, "Width of 2 is not supported");
   CHECK(PU::isMIP(pu, toChannelType(compId)), "We should not get here for MIP.");
-  // »ñÈ¡Ô¤²âÄ£Ê½
+  // è·å–é¢„æµ‹æ¨¡å¼
   const uint32_t       uiDirMode    = isLuma( compId ) && pu.cu->bdpcmMode ? BDPCM_IDX : !isLuma(compId) && pu.cu->bdpcmModeChroma ? BDPCM_IDX : PU::getFinalIntraMode(pu, channelType);
 
   CHECK( floorLog2(iWidth) < 2 && pu.cs->pcv->noChroma2x2, "Size not allowed" );
@@ -231,19 +231,19 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
   const int srcStride  = m_refBufferStride[compID];
   const int srcHStride = 2;
 
-  const CPelBuf & srcBuf = CPelBuf(getPredictorPtr(compID), srcStride, srcHStride); //²Î¿¼ÏñËØ
+  const CPelBuf & srcBuf = CPelBuf(getPredictorPtr(compID), srcStride, srcHStride); //å‚è€ƒåƒç´ 
   const ClpRng& clpRng(pu.cu->cs->slice->clpRng(compID));
 
-  // ¸ù¾İÄ£Ê½·Ö±ğÖ´ĞĞ²»Í¬µÄº¯ÊıÀ´µÃµ½²Î¿¼ÏñËØ
+  // æ ¹æ®æ¨¡å¼åˆ†åˆ«æ‰§è¡Œä¸åŒçš„å‡½æ•°æ¥å¾—åˆ°å‚è€ƒåƒç´ 
   switch (uiDirMode)
   {
     case(PLANAR_IDX): xPredIntraPlanar(srcBuf, piPred); break;
     case(DC_IDX):     xPredIntraDc(srcBuf, piPred, channelType, false); break;
     case(BDPCM_IDX):  xPredIntraBDPCM(srcBuf, piPred, isLuma(compID) ? pu.cu->bdpcmMode : pu.cu->bdpcmModeChroma, clpRng); break;
-      // ½Ç¶ÈÔ¤²âº¯Êı
+      // è§’åº¦é¢„æµ‹å‡½æ•°
     default:          xPredIntraAng(srcBuf, piPred, channelType, clpRng); break;
   }
-  // ¶ÔPlanarºÍDC×öPDPCĞŞÕıÆ½»¬,ÆäÓà½Ç¶ÈÄ£Ê½µÄPDPCÔÚxPredIntraAngº¯ÊıÖĞ½øĞĞ
+  // å¯¹Planarå’ŒDCåšPDPCä¿®æ­£å¹³æ»‘,å…¶ä½™è§’åº¦æ¨¡å¼çš„PDPCåœ¨xPredIntraAngå‡½æ•°ä¸­è¿›è¡Œ
   if (m_ipaParam.applyPDPC)
   {
     PelBuf dstBuf = piPred;
@@ -359,92 +359,92 @@ void IntraPrediction::xPredIntraDc( const CPelBuf &pSrc, PelBuf &pDst, const Cha
 }
 
 // Function for initialization of intra prediction parameters
-// 1. ÅĞ¶Ïµ±Ç°Ä£Ê½ÊÇ´¹Ö±ÀàÄ£Ê½»¹ÊÇË®Æ½ÀàÄ£Ê½
-// 2. ¸ù¾İµ±Ç°Ä£Ê½¼ÆËã½Ç¶ÈÆ«ÒÆÖµ
-// 3. ¸ù¾İµ±Ç°Ä£Ê½ÅĞ¶ÏPDPCÊÇ·ñ¿ÉÓÃ
-// 4. ÅĞ¶ÏÊÇ·ñ¶Ôµ±Ç°Ä£Ê½²Î¿¼ÏñËØ½øĞĞÂË²¨ÒÔ¼°Ê¹ÓÃÊ²Ã´ÂË²¨·½·¨
+// 1. åˆ¤æ–­å½“å‰æ¨¡å¼æ˜¯å‚ç›´ç±»æ¨¡å¼è¿˜æ˜¯æ°´å¹³ç±»æ¨¡å¼
+// 2. æ ¹æ®å½“å‰æ¨¡å¼è®¡ç®—è§’åº¦åç§»å€¼
+// 3. æ ¹æ®å½“å‰æ¨¡å¼åˆ¤æ–­PDPCæ˜¯å¦å¯ç”¨
+// 4. åˆ¤æ–­æ˜¯å¦å¯¹å½“å‰æ¨¡å¼å‚è€ƒåƒç´ è¿›è¡Œæ»¤æ³¢ä»¥åŠä½¿ç”¨ä»€ä¹ˆæ»¤æ³¢æ–¹æ³•
 void IntraPrediction::initPredIntraParams(const PredictionUnit & pu, const CompArea area, const SPS& sps)
 {
   const ComponentID compId = area.compID;
   const ChannelType chType = toChannelType(compId);
-  // ÊÇ·ñÊ¹ÓÃISP
+  // æ˜¯å¦ä½¿ç”¨ISP
   const bool        useISP = NOT_INTRA_SUBPARTITIONS != pu.cu->ispMode && isLuma( chType );
 
   const Size   cuSize    = Size( pu.cu->blocks[compId].width, pu.cu->blocks[compId].height );
   const Size   puSize    = Size( area.width, area.height );
-  // ¿é´óĞ¡£¬¿´ÊÇ·ñÓÃISP
+  // å—å¤§å°ï¼Œçœ‹æ˜¯å¦ç”¨ISP
   const Size&  blockSize = useISP ? cuSize : puSize;
-  // »ñÈ¡½Ç¶ÈÄ£Ê½ 0~66
-  const int      dirMode = PU::getFinalIntraMode(pu, chType); // Õâ¸öÆäÊµÉ¸Ñ¡Ê±ºò¸øµÄÄ£Ê½
-  // À©Õ¹µ½¿í½Ç¶ÈÄ£Ê½
+  // è·å–è§’åº¦æ¨¡å¼ 0~66
+  const int      dirMode = PU::getFinalIntraMode(pu, chType); // è¿™ä¸ªå…¶å®ç­›é€‰æ—¶å€™ç»™çš„æ¨¡å¼
+  // æ‰©å±•åˆ°å®½è§’åº¦æ¨¡å¼
   const int     predMode = getModifiedWideAngle( blockSize.width, blockSize.height, dirMode );
 
-  // ÅĞ¶ÏÊÇ´¹Ö±ÀàÄ£Ê½»¹ÊÇË®Æ½ÀàÄ£Ê½>=34ÊÇ´¹Ö±Àà
-  m_ipaParam.isModeVer            = predMode >= DIA_IDX; // 34ÊÇ×óÉÏ½Ç
-  // ¶à²Î¿¼ĞĞË÷Òı
+  // åˆ¤æ–­æ˜¯å‚ç›´ç±»æ¨¡å¼è¿˜æ˜¯æ°´å¹³ç±»æ¨¡å¼>=34æ˜¯å‚ç›´ç±»
+  m_ipaParam.isModeVer            = predMode >= DIA_IDX; // 34æ˜¯å·¦ä¸Šè§’
+  // å¤šå‚è€ƒè¡Œç´¢å¼•
   m_ipaParam.multiRefIndex        = isLuma (chType) ? pu.multiRefIdx : 0 ;
-  m_ipaParam.refFilterFlag        = false; // ²Î¿¼ÏñËØÂË²¨
-  m_ipaParam.interpolationFlag    = false; // ²åÖµ
+  m_ipaParam.refFilterFlag        = false; // å‚è€ƒåƒç´ æ»¤æ³¢
+  m_ipaParam.interpolationFlag    = false; // æ’å€¼
 
-  // ÅĞ¶ÏÊÇ·ñÊ¹ÓÃPDPC£º´óÓÚµÈÓÚ4x4ÇÒ²»Ê¹ÓÃMRL¶à²Î¿¼ĞĞ
+  // åˆ¤æ–­æ˜¯å¦ä½¿ç”¨PDPCï¼šå¤§äºç­‰äº4x4ä¸”ä¸ä½¿ç”¨MRLå¤šå‚è€ƒè¡Œ
   m_ipaParam.applyPDPC            = (puSize.width >= MIN_TB_SIZEY && puSize.height >= MIN_TB_SIZEY) && m_ipaParam.multiRefIndex == 0;
 
-  // ½Ç¶ÈÄ£Ê½¹ØÓÚË®Æ½ºÍ´¹Ö±µÄÆ«ÒÆ
-  // [19, 49]ÊÇ¸ºÖµ
-  // Èç¹ûpredMode>=34£¬ÔòintraPredAngleMode=predMode-VER_IDX(50)
-  // ·ñÔò£¬intraPredAngleMode=HOR_IDX(18)-predMode
-  // ÓÉÓÚ¿í½Ç¶ÈÄ£Ê½Îª-14~80£¬¹Ê¸ÃÖµÎª-16~32 
-  // Ã¿Ò»ÖÖ½Ç¶ÈÄ£Ê½¶¼Ïàµ±ÓÚÔÚË®Æ½·½Ïò»òÕß´¹Ö±·½ÏòÉÏ×öÁËÒ»¸ö½Ç¶ÈÆ«ÒÆ
+  // è§’åº¦æ¨¡å¼å…³äºæ°´å¹³å’Œå‚ç›´çš„åç§»
+  // [19, 49]æ˜¯è´Ÿå€¼
+  // å¦‚æœpredMode>=34ï¼Œåˆ™intraPredAngleMode=predMode-VER_IDX(50)
+  // å¦åˆ™ï¼ŒintraPredAngleMode=HOR_IDX(18)-predMode
+  // ç”±äºå®½è§’åº¦æ¨¡å¼ä¸º-14~80ï¼Œæ•…è¯¥å€¼ä¸º-16~32 
+  // æ¯ä¸€ç§è§’åº¦æ¨¡å¼éƒ½ç›¸å½“äºåœ¨æ°´å¹³æ–¹å‘æˆ–è€…å‚ç›´æ–¹å‘ä¸Šåšäº†ä¸€ä¸ªè§’åº¦åç§»
   const int    intraPredAngleMode = (m_ipaParam.isModeVer) ? predMode - VER_IDX : -(predMode - HOR_IDX);
   
   int absAng = 0;
-  // 65ÖÖ½Ç¶ÈÄ£Ê½¶ÔÓ¦µÄÆ«ÒÆ
+  // 65ç§è§’åº¦æ¨¡å¼å¯¹åº”çš„åç§»
   if (dirMode > DC_IDX && dirMode < NUM_LUMA_MODE) // intraPredAngle for directional modes
   {
-    // //Æ«ÀëË®Æ½»ò´¹Ö±²»Í¬³Ì¶ÈµÄ²»Í¬Ä£Ê½¶ÔÓ¦µÄÄ£Ê½Æ«ÒÆÖµoffset
-    // ÏÈ³ËÒÔ256£¨×óÒÆ8Î»£©£¬ÔËËã³ö½á¹ûÔÙÓÒÒÆ8Î»£¬ÒÔ¶¨µãÊµÏÖ¸¡µãÔËËã¾«¶È
+    // //åç¦»æ°´å¹³æˆ–å‚ç›´ä¸åŒç¨‹åº¦çš„ä¸åŒæ¨¡å¼å¯¹åº”çš„æ¨¡å¼åç§»å€¼offset
+    // å…ˆä¹˜ä»¥256ï¼ˆå·¦ç§»8ä½ï¼‰ï¼Œè¿ç®—å‡ºç»“æœå†å³ç§»8ä½ï¼Œä»¥å®šç‚¹å®ç°æµ®ç‚¹è¿ç®—ç²¾åº¦
     static const int angTable[32]    = { 0,    1,    2,    3,    4,    6,     8,   10,   12,   14,   16,   18,   20,   23,   26,   29,   32,   35,   39,  45,  51,  57,  64,  73,  86, 102, 128, 171, 256, 341, 512, 1024 };
 
-    // ´æ·´½Ç¶È¶ÔÓ¦µÄÆ«ÒÆÖµ£¬Ä¿µÄÊÇÎªÁËÏû³ıÖ¡ÄÚ½Ç¶ÈÔ¤²âÄ£Ê½ÔÚ¼ÆËãÔ¤²âÖµÊ±µÄ³ı·¨ÔËËã
+    // å­˜åè§’åº¦å¯¹åº”çš„åç§»å€¼ï¼Œç›®çš„æ˜¯ä¸ºäº†æ¶ˆé™¤å¸§å†…è§’åº¦é¢„æµ‹æ¨¡å¼åœ¨è®¡ç®—é¢„æµ‹å€¼æ—¶çš„é™¤æ³•è¿ç®—
     static const int invAngTable[32] = {
       0,   16384, 8192, 5461, 4096, 2731, 2048, 1638, 1365, 1170, 1024, 910, 819, 712, 630, 565,
       512, 468,   420,  364,  321,  287,  256,  224,  191,  161,  128,  96,  64,  48,  32,  16
-    };   // (512 * 32) / Angle Í¶Ó°µÄÎ»ÖÃ£¬ÓÃµÄÊ±ºòĞèÒªÓÒÒÆ9Î»
+    };   // (512 * 32) / Angle æŠ•å½±çš„ä½ç½®ï¼Œç”¨çš„æ—¶å€™éœ€è¦å³ç§»9ä½
 
-    // Ä£Ê½Æ«ÀëË®Æ½»ò´¹Ö±µÄÖµ£¨È¡¾ø¶ÔÖµ£©0~32
+    // æ¨¡å¼åç¦»æ°´å¹³æˆ–å‚ç›´çš„å€¼ï¼ˆå–ç»å¯¹å€¼ï¼‰0~32
     const int     absAngMode         = abs(intraPredAngleMode); 
-    const int     signAng            = intraPredAngleMode < 0 ? -1 : 1; // Ä£Ê½19~49Ê±ºòÎª-1
-                  absAng             = angTable  [absAngMode]; // ½Ç¶ÈÆ«ÒÆ
+    const int     signAng            = intraPredAngleMode < 0 ? -1 : 1; // æ¨¡å¼19~49æ—¶å€™ä¸º-1
+                  absAng             = angTable  [absAngMode]; // è§’åº¦åç§»
 
-    // ½Ç¶ÈÆ«ÒÆÖµµÄµ¹Êı*512*32£¬ºóĞø±ãÓÚ³ı·¨ÔËËã
+    // è§’åº¦åç§»å€¼çš„å€’æ•°*512*32ï¼Œåç»­ä¾¿äºé™¤æ³•è¿ç®—
     m_ipaParam.absInvAngle           = invAngTable[absAngMode];
-    // Ô¤²â½Ç¶È£¨´øÕı¸ººÅµÄÆ«ÒÆÖµ£©
+    // é¢„æµ‹è§’åº¦ï¼ˆå¸¦æ­£è´Ÿå·çš„åç§»å€¼ï¼‰
     m_ipaParam.intraPredAngle        = signAng * absAng;
-    if (intraPredAngleMode < 0) // ÔÙ´ÎÅĞ¶ÏÊÇ·ñÊ¹ÓÃPDPC£¬[19, 49]²»Ê¹ÓÃPDPC
+    if (intraPredAngleMode < 0) // å†æ¬¡åˆ¤æ–­æ˜¯å¦ä½¿ç”¨PDPCï¼Œ[19, 49]ä¸ä½¿ç”¨PDPC
     {
       m_ipaParam.applyPDPC = false;
     }
     else if (intraPredAngleMode > 0)// [-14, 18], [50, 80]
     {
-      // ¸ù¾İÔ¤²âÄ£Ê½¶ÔÓ¦²àµÄ³¤¶È
+      // æ ¹æ®é¢„æµ‹æ¨¡å¼å¯¹åº”ä¾§çš„é•¿åº¦
       const int sideSize = m_ipaParam.isModeVer ? puSize.height : puSize.width;
-      const int maxScale = 2;//Ëõ·ÅµÄÉèÖÃ
+      const int maxScale = 2;//ç¼©æ”¾çš„è®¾ç½®
 
       m_ipaParam.angularScale = std::min(maxScale, floorLog2(sideSize) - (floorLog2(3 * m_ipaParam.absInvAngle - 2) - 8));
-      // ·Ç´¹Ö±·ÇË®Æ½Ä£Ê½ÒªÇóscale>=0
+      // éå‚ç›´éæ°´å¹³æ¨¡å¼è¦æ±‚scale>=0
       m_ipaParam.applyPDPC &= m_ipaParam.angularScale >= 0;
     }
   }
 
-  // ÊÇ·ñ¶Ô²Î¿¼ÏñËØ½øĞĞÂË²¨
+  // æ˜¯å¦å¯¹å‚è€ƒåƒç´ è¿›è¡Œæ»¤æ³¢
   // high level conditions and DC intra prediction
-  // ÈôSPS±êÊ¶²Î¿¼ÏñËØÂË²¨²»¿ÉÓÃ
-  // »òµ±Ç°¿é²»ÊÇLuma¿é
-  // »òÊ¹ÓÃISP£¨¶à»®·ÖÔ¤²â£©
-  // »òÊ¹ÓÃMIP£¨¾ØÕó¼ÓÈ¨Ö¡ÄÚÔ¤²â£©
-  // »òÊ¹ÓÃ·ÇµÚ0ĞĞ²Î¿¼ÏñËØ
-  // »òÊ¹ÓÃDCÄ£Ê½Ê±
-  // ²»½øĞĞÖ®ºóµÄÅĞ¶Ï²¢ÇÒ±£³Ö²»ÂË²¨µÄ³õÊ¼ÉèÖÃ
+  // è‹¥SPSæ ‡è¯†å‚è€ƒåƒç´ æ»¤æ³¢ä¸å¯ç”¨
+  // æˆ–å½“å‰å—ä¸æ˜¯Lumaå—
+  // æˆ–ä½¿ç”¨ISPï¼ˆå¤šåˆ’åˆ†é¢„æµ‹ï¼‰
+  // æˆ–ä½¿ç”¨MIPï¼ˆçŸ©é˜µåŠ æƒå¸§å†…é¢„æµ‹ï¼‰
+  // æˆ–ä½¿ç”¨éç¬¬0è¡Œå‚è€ƒåƒç´ 
+  // æˆ–ä½¿ç”¨DCæ¨¡å¼æ—¶
+  // ä¸è¿›è¡Œä¹‹åçš„åˆ¤æ–­å¹¶ä¸”ä¿æŒä¸æ»¤æ³¢çš„åˆå§‹è®¾ç½®
   if(   sps.getSpsRangeExtension().getIntraSmoothingDisabledFlag()
     || !isLuma( chType )
     || useISP
@@ -454,41 +454,41 @@ void IntraPrediction::initPredIntraParams(const PredictionUnit & pu, const CompA
     )
   {
   }
-  //Èç¹ûµ±Ç°¿éÊÇÁÁ¶ÈÍ¬Ê±ÎªBDPCMÄ£Ê½
-  //É«¶ÈBDPCMÄ£Ê½
+  //å¦‚æœå½“å‰å—æ˜¯äº®åº¦åŒæ—¶ä¸ºBDPCMæ¨¡å¼
+  //è‰²åº¦BDPCMæ¨¡å¼
   else if ((isLuma(chType) && pu.cu->bdpcmMode) || (!isLuma(chType) && pu.cu->bdpcmModeChroma)) // BDPCM
   {
     m_ipaParam.refFilterFlag = false;
   }
-  // planarÄ£Ê½ÔÚCUÏñËØ´óÓÚ32²Å½øĞĞ
-  else if (dirMode == PLANAR_IDX) // Planar intra prediction£¬
+  // planaræ¨¡å¼åœ¨CUåƒç´ å¤§äº32æ‰è¿›è¡Œ
+  else if (dirMode == PLANAR_IDX) // Planar intra predictionï¼Œ
   {
-    // Ê¹ÓÃ [1 2 1]/4ÂË²¨
+    // ä½¿ç”¨ [1 2 1]/4æ»¤æ³¢
     m_ipaParam.refFilterFlag = puSize.width * puSize.height > 32 ? true : false; 
   }
-  // ²»ÓÃISP
-  else if (!useISP)// HOR, VER and angular modes (MDIS) Ë®Æ½¡¢´¹Ö±ºÍÆäÓà½Ç¶ÈÄ£Ê½
+  // ä¸ç”¨ISP
+  else if (!useISP)// HOR, VER and angular modes (MDIS) æ°´å¹³ã€å‚ç›´å’Œå…¶ä½™è§’åº¦æ¨¡å¼
   {
-    // Èı´Î²åÖµÂË²¨Æ÷µÄÌõ¼ş
+    // ä¸‰æ¬¡æ’å€¼æ»¤æ³¢å™¨çš„æ¡ä»¶
     bool filterFlag = false;
     {
-      // ÓëË®Æ½Ä£Ê½»ò´¹Ö±Ä£Ê½µÄÄ£Ê½±êºÅ²î
+      // ä¸æ°´å¹³æ¨¡å¼æˆ–å‚ç›´æ¨¡å¼çš„æ¨¡å¼æ ‡å·å·®
       const int diff = std::min<int>( abs( predMode - HOR_IDX ), abs( predMode - VER_IDX ) );
-      // log2(width)ºÍlog2(height)µÄ¾ùÖµ
+      // log2(width)å’Œlog2(height)çš„å‡å€¼
       const int log2Size = ((floorLog2(puSize.width) + floorLog2(puSize.height)) >> 1);
       CHECK( log2Size >= MAX_INTRA_FILTER_DEPTHS, "Size not supported" );
-      filterFlag = (diff > m_aucIntraFilter[log2Size]); // ´óÓÚ²»Ê¹ÓÃÈı´Î²îÖµ
+      filterFlag = (diff > m_aucIntraFilter[log2Size]); // å¤§äºä¸ä½¿ç”¨ä¸‰æ¬¡å·®å€¼
     }
 
     // Selelection of either ([1 2 1] / 4 ) refrence filter OR Gaussian 4-tap interpolation filter
 
-    //  ²»Ê¹ÓÃÈı´Î²åÖµÂË²¨£¬Ñ¡Ôñ[1 2 1]/4²Î¿¼ÏñËØÂË²¨Æ÷»òÕß4³éÍ·¸ßË¹²åÖµÂË²¨Æ÷
+    //  ä¸ä½¿ç”¨ä¸‰æ¬¡æ’å€¼æ»¤æ³¢ï¼Œé€‰æ‹©[1 2 1]/4å‚è€ƒåƒç´ æ»¤æ³¢å™¨æˆ–è€…4æŠ½å¤´é«˜æ–¯æ’å€¼æ»¤æ³¢å™¨
     if (filterFlag)
     {
       const bool isRefFilter       =  isIntegerSlope(absAng);
       CHECK( puSize.width * puSize.height <= 32, "DCT-IF interpolation filter is always used for 4x4, 4x8, and 8x4 luma CB" );
-      m_ipaParam.refFilterFlag     =  isRefFilter; //½Ç¶ÈÆ«ÒÆÖµÎª32ÕûÊı±¶Ê±ÆôÓÃ²Î¿¼ÏñËØÂË²¨
-      m_ipaParam.interpolationFlag = !isRefFilter; //²åÖµ±êÖ¾Óë²Î¿¼ÏñËØÂË²¨±êÖ¾Ïà·´
+      m_ipaParam.refFilterFlag     =  isRefFilter; //è§’åº¦åç§»å€¼ä¸º32æ•´æ•°å€æ—¶å¯ç”¨å‚è€ƒåƒç´ æ»¤æ³¢
+      m_ipaParam.interpolationFlag = !isRefFilter; //æ’å€¼æ ‡å¿—ä¸å‚è€ƒåƒç´ æ»¤æ³¢æ ‡å¿—ç›¸å
     }
   }
 }
@@ -513,10 +513,10 @@ void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
 
   const bool bIsModeVer     = m_ipaParam.isModeVer;
   const int  multiRefIdx    = m_ipaParam.multiRefIndex;
-  // ½Ç¶ÈÆ«ÒÆÖµ£¬·ÖÕı¸º
-  const int  intraPredAngle = m_ipaParam.intraPredAngle; //½Ç¶ÈÆ«ÒÆ£¬Ã¿ÖÖÄ£Ê½Ïà¶ÔË®Æ½»ò´¹Ö±·½ÏòµÄ½Ç¶ÈÆ«ÒÆ
+  // è§’åº¦åç§»å€¼ï¼Œåˆ†æ­£è´Ÿ
+  const int  intraPredAngle = m_ipaParam.intraPredAngle; //è§’åº¦åç§»ï¼Œæ¯ç§æ¨¡å¼ç›¸å¯¹æ°´å¹³æˆ–å‚ç›´æ–¹å‘çš„è§’åº¦åç§»
  
-  // ½Ç¶ÈÆ«ÒÆÖµµÄµ¹Êı*512*32£¬±ãÓÚ³ı·¨ÔËËã
+  // è§’åº¦åç§»å€¼çš„å€’æ•°*512*32ï¼Œä¾¿äºé™¤æ³•è¿ç®—
   const int  absInvAngle    = m_ipaParam.absInvAngle;
 
   Pel* refMain;
@@ -526,10 +526,10 @@ void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
   Pel  refLeft [2 * MAX_CU_SIZE + 3 + 33 * MAX_REF_LINE_IDX];
 
   // Initialize the Main and Left reference array.
-  // ³õÊ¼»¯²Î¿¼ÏñËØ
-  // Æ«ÒÆÖµoffsetĞ¡ÓÚ0£¬¼´Ä£Ê½Îª19~49
-  // ¶ÔÓÚ´¹Ö±ÀàÄ£Ê½(34~49),ĞèÒª½«×ó²à²Î¿¼ĞĞÓ³Éäµ½ÉÏ·½²Î¿¼ĞĞ
-  // ¶ÔÓÚË®Æ½ÀàÄ£Ê½(18~33),ĞèÒª½«ÉÏ·½²Î¿¼ĞĞÓ³Éäµ½×ó²à²Î¿¼ĞĞ
+  // åˆå§‹åŒ–å‚è€ƒåƒç´ 
+  // åç§»å€¼offsetå°äº0ï¼Œå³æ¨¡å¼ä¸º19~49
+  // å¯¹äºå‚ç›´ç±»æ¨¡å¼(34~49),éœ€è¦å°†å·¦ä¾§å‚è€ƒè¡Œæ˜ å°„åˆ°ä¸Šæ–¹å‚è€ƒè¡Œ
+  // å¯¹äºæ°´å¹³ç±»æ¨¡å¼(18~33),éœ€è¦å°†ä¸Šæ–¹å‚è€ƒè¡Œæ˜ å°„åˆ°å·¦ä¾§å‚è€ƒè¡Œ
   if (intraPredAngle < 0)
   {
     for (int x = 0; x <= width + 1 + multiRefIdx; x++)
@@ -540,22 +540,22 @@ void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
     {
       refLeft[y + width] = pSrc.at(y, 1);
     }
-    // ver ´¹Ö±£¬hor Ë®Æ½
-    // Èç¹ûÊÇ´¹Ö±ÀàÄ£Ê½(34~49)£¬ÔòÖ÷Òª²àÎªÕıÉÏ·½²Î¿¼ĞĞ£¬´ÎÒª²àÎªÕı×ó²à²Î¿¼ĞĞ
-    // Èç¹ûÊÇË®Æ½ÀàÄ£Ê½(19~33),ÔòÖ÷Òª²àÎªÕı×ó²à²Î¿¼ĞĞ£¬´ÎÒª²àÎªÕıÉÏ·½²Î¿¼ĞĞ
-    refMain = bIsModeVer ? refAbove + height : refLeft + width; // Ö÷Òª²Î¿¼
-    refSide = bIsModeVer ? refLeft + width : refAbove + height; // ´ÎÒª²Î¿¼
+    // ver å‚ç›´ï¼Œhor æ°´å¹³
+    // å¦‚æœæ˜¯å‚ç›´ç±»æ¨¡å¼(34~49)ï¼Œåˆ™ä¸»è¦ä¾§ä¸ºæ­£ä¸Šæ–¹å‚è€ƒè¡Œï¼Œæ¬¡è¦ä¾§ä¸ºæ­£å·¦ä¾§å‚è€ƒè¡Œ
+    // å¦‚æœæ˜¯æ°´å¹³ç±»æ¨¡å¼(19~33),åˆ™ä¸»è¦ä¾§ä¸ºæ­£å·¦ä¾§å‚è€ƒè¡Œï¼Œæ¬¡è¦ä¾§ä¸ºæ­£ä¸Šæ–¹å‚è€ƒè¡Œ
+    refMain = bIsModeVer ? refAbove + height : refLeft + width; // ä¸»è¦å‚è€ƒ
+    refSide = bIsModeVer ? refLeft + width : refAbove + height; // æ¬¡è¦å‚è€ƒ
 
-    // Extend the Main reference to the left. ´ÎÒª²Î¿¼ĞĞÏò×óÀ©Õ¹
-    // ´ÎÒª²Î¿¼ĞĞÍ¶Ó°µ½Ö÷²Î¿¼²à
+    // Extend the Main reference to the left. æ¬¡è¦å‚è€ƒè¡Œå‘å·¦æ‰©å±•
+    // æ¬¡è¦å‚è€ƒè¡ŒæŠ•å½±åˆ°ä¸»å‚è€ƒä¾§
     int sizeSide = bIsModeVer ? height : width;
     for (int k = -sizeSide; k <= -1; k++)
     {
-      // ÓÒÒÆ9Î»ÊÇÒòÎª´æ´¢ÔÚ±íÀïµÄÊÇ (512 * 32) /Angle£¬ĞèÒªÔÙ¸øËü³ıÒÔ512
+      // å³ç§»9ä½æ˜¯å› ä¸ºå­˜å‚¨åœ¨è¡¨é‡Œçš„æ˜¯ (512 * 32) /Angleï¼Œéœ€è¦å†ç»™å®ƒé™¤ä»¥512
       refMain[k] = refSide[std::min((-k * absInvAngle + 256) >> 9, sizeSide)];
     }
   }
-  else// Æ«ÒÆÖµ´óÓÚµÈÓÚ0£¬Ö»ĞèÒªÓÃµ½ÉÏ·½²Î¿¼ÏñËØ»òÕß×ó²à²Î¿¼ÏñËØ
+  else// åç§»å€¼å¤§äºç­‰äº0ï¼Œåªéœ€è¦ç”¨åˆ°ä¸Šæ–¹å‚è€ƒåƒç´ æˆ–è€…å·¦ä¾§å‚è€ƒåƒç´ 
   {
     for (int x = 0; x <= m_topRefLength + multiRefIdx; x++)
     {
@@ -565,13 +565,13 @@ void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
     {
       refLeft[y] = pSrc.at(y, 1);
     }
-    // ´¹Ö±ÀàÄ£Ê½£¬Ö÷²Î¿¼ĞĞÎªÉÏ·½²Î¿¼ĞĞ
-    // Ë®Æ½ÀàÄ£Ê½£¬Ö÷²Î¿¼ĞĞÎª×ó²à²Î¿¼ĞĞ
+    // å‚ç›´ç±»æ¨¡å¼ï¼Œä¸»å‚è€ƒè¡Œä¸ºä¸Šæ–¹å‚è€ƒè¡Œ
+    // æ°´å¹³ç±»æ¨¡å¼ï¼Œä¸»å‚è€ƒè¡Œä¸ºå·¦ä¾§å‚è€ƒè¡Œ
     refMain = bIsModeVer ? refAbove : refLeft;
     refSide = bIsModeVer ? refLeft : refAbove;
 
     // Extend main reference to right using replication
-    // Ê¹ÓÃ¸´ÖÆ½«Ö÷²Î¿¼ĞĞÏòÓÒÀ©Õ¹»òÕßÏòÏÂÀ©Õ¹£¬¼´Ìî³äSegment AºÍSegment F£¨MRL)
+    // ä½¿ç”¨å¤åˆ¶å°†ä¸»å‚è€ƒè¡Œå‘å³æ‰©å±•æˆ–è€…å‘ä¸‹æ‰©å±•ï¼Œå³å¡«å……Segment Aå’ŒSegment Fï¼ˆMRL)
     const int log2Ratio = floorLog2(width) - floorLog2(height);
     const int s         = std::max<int>(0, bIsModeVer ? log2Ratio : -log2Ratio);
     const int maxIndex  = (multiRefIdx << s) + 2;
@@ -584,7 +584,7 @@ void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
   }
 
   // swap width/height if we are doing a horizontal mode:
-  // Èç¹ûÊÇË®Æ½ÀàÄ£Ê½Ôò½»»»widthºÍheight
+  // å¦‚æœæ˜¯æ°´å¹³ç±»æ¨¡å¼åˆ™äº¤æ¢widthå’Œheight
   if (!bIsModeVer)
   {
     std::swap(width, height);
@@ -594,21 +594,21 @@ void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
   Pel *     pDstBuf   = bIsModeVer ? pDst.buf : tempArray;
 
   // compensate for line offset in reference line buffers
-  // ²¹³ä¶à²Î¿¼ĞĞÖĞµÄÆ«ÒÆ
+  // è¡¥å……å¤šå‚è€ƒè¡Œä¸­çš„åç§»
   refMain += multiRefIdx;
   refSide += multiRefIdx;
 
   Pel *pDsty = pDstBuf;
 
-  if( intraPredAngle == 0 )  // pure vertical or pure horizontal Ë®Æ½Ä£Ê½ºÍ´¹Ö±Ä£Ê½£¨18ºÍ50£©
+  if( intraPredAngle == 0 )  // pure vertical or pure horizontal æ°´å¹³æ¨¡å¼å’Œå‚ç›´æ¨¡å¼ï¼ˆ18å’Œ50ï¼‰
   {
     for( int y = 0; y < height; y++ )
     {
       for( int x = 0; x < width; x++ )
       {
-        pDsty[x] = refMain[x + 1]; // Ö±½ÓÍ¶Ó°
+        pDsty[x] = refMain[x + 1]; // ç›´æ¥æŠ•å½±
       }
-      // Ê¹ÓÃPDPC
+      // ä½¿ç”¨PDPC
       if (m_ipaParam.applyPDPC)
       {
         const int scale   = (floorLog2(width) + floorLog2(height) - 2) >> 2;
@@ -625,22 +625,22 @@ void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
       pDsty += dstStride;
     }
   }
-  else // ÆäÓà½Ç¶ÈÄ£Ê½
+  else // å…¶ä½™è§’åº¦æ¨¡å¼
   {
     for (int y = 0, deltaPos = intraPredAngle * (1 + multiRefIdx); y<height; y++, deltaPos += intraPredAngle, pDsty += dstStride)
     {
       
-      const int deltaInt   = deltaPos >> 5;// ÕûÏñËØÎ»ÖÃ
-      const int deltaFract = deltaPos & 31;// ·ÖÏñËØÎ»ÖÃ
-      // ¶ÔÓÚ³ıË®Æ½¡¢´¹Ö±¡¢Ä£Ê½2¡¢34¡¢66Ö®ÍâµÄÄ£Ê½Ğè½øĞĞÊ¹ÓÃ¸ßË¹²åÖµÂË²¨Æ÷½øĞĞ²åÖµ´¦Àí
+      const int deltaInt   = deltaPos >> 5;// æ•´åƒç´ ä½ç½®
+      const int deltaFract = deltaPos & 31;// åˆ†åƒç´ ä½ç½®
+      // å¯¹äºé™¤æ°´å¹³ã€å‚ç›´ã€æ¨¡å¼2ã€34ã€66ä¹‹å¤–çš„æ¨¡å¼éœ€è¿›è¡Œä½¿ç”¨é«˜æ–¯æ’å€¼æ»¤æ³¢å™¨è¿›è¡Œæ’å€¼å¤„ç†
       if ( !isIntegerSlope( abs(intraPredAngle) ) )
       {
         if( isLuma(channelType) )
         {
           const bool useCubicFilter = !m_ipaParam.interpolationFlag;
-          // ËÄ³éÍ·¸ßË¹²åÖµÂË²¨Æ÷
+          // å››æŠ½å¤´é«˜æ–¯æ’å€¼æ»¤æ³¢å™¨
           const TFilterCoeff        intraSmoothingFilter[4] = {TFilterCoeff(16 - (deltaFract >> 1)), TFilterCoeff(32 - (deltaFract >> 1)), TFilterCoeff(16 + (deltaFract >> 1)), TFilterCoeff(deltaFract >> 1)};
-          // ÅĞ¶ÏÊÇÊ¹ÓÃÈı´Î²åÖµÂË²¨Æ÷»¹ÊÇ¸ßË¹²åÖµÂË²¨Æ÷
+          // åˆ¤æ–­æ˜¯ä½¿ç”¨ä¸‰æ¬¡æ’å€¼æ»¤æ³¢å™¨è¿˜æ˜¯é«˜æ–¯æ’å€¼æ»¤æ³¢å™¨
           const TFilterCoeff* const f                       = (useCubicFilter) ? InterpolationFilter::getChromaFilterTable(deltaFract) : intraSmoothingFilter;
 
           for (int x = 0; x < width; x++)
@@ -657,10 +657,10 @@ void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
             pDsty[x] = ClipPel(val, clpRng);   // always clip even though not always needed
           }
         }
-        else // É«¶È
+        else // è‰²åº¦
         {
           // Do linear filtering
-          // ÏßĞÔÂË²¨
+          // çº¿æ€§æ»¤æ³¢
           for (int x = 0; x < width; x++)
           {
             Pel p[2];
@@ -674,13 +674,13 @@ void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
       }
       else
       {
-        // Just copy the integer samples Ö±½Ó¸´ÖÆÕûÊıÎ»ÖÃ´¦µÄ²Î¿¼ÏñËØ
+        // Just copy the integer samples ç›´æ¥å¤åˆ¶æ•´æ•°ä½ç½®å¤„çš„å‚è€ƒåƒç´ 
         for( int x = 0; x < width; x++ )
         {
           pDsty[x] = refMain[x + deltaInt + 1];
         }
       }
-      // Ó¦ÓÃPDPC¼ÆÊı
+      // åº”ç”¨PDPCè®¡æ•°
       if (m_ipaParam.applyPDPC)
       {
         const int scale       = m_ipaParam.angularScale;
@@ -699,7 +699,7 @@ void IntraPrediction::xPredIntraAng( const CPelBuf &pSrc, PelBuf &pDst, const Ch
   }
 
   // Flip the block if this is the horizontal mode
-  // Ë®Æ½Ä£Ê½·­×ª¿é
+  // æ°´å¹³æ¨¡å¼ç¿»è½¬å—
   if( !bIsModeVer )
   {
     for( int y = 0; y < height; y++ )
@@ -847,39 +847,39 @@ inline int  isLeftAvailable       ( const CodingUnit &cu, const ChannelType &chT
 inline int  isAboveRightAvailable ( const CodingUnit &cu, const ChannelType &chType, const Position &posRT, const uint32_t uiNumUnitsInPU, const uint32_t unitHeight, bool *validFlags );
 inline int  isBelowLeftAvailable  ( const CodingUnit &cu, const ChannelType &chType, const Position &posLB, const uint32_t uiNumUnitsInPU, const uint32_t unitHeight, bool *validFlags );
 
-void IntraPrediction::initIntraPatternChType(const CodingUnit &cu, const CompArea &area, const bool forceRefFilterFlag) // forceRefFilterFlag±íÊ¾Ç¿ÖÆ½øĞĞ²Î¿¼ÏñËØÂË²¨
+void IntraPrediction::initIntraPatternChType(const CodingUnit &cu, const CompArea &area, const bool forceRefFilterFlag) // forceRefFilterFlagè¡¨ç¤ºå¼ºåˆ¶è¿›è¡Œå‚è€ƒåƒç´ æ»¤æ³¢
 {
   CHECK(area.width == 2, "Width of 2 is not supported");
   const CodingStructure& cs   = *cu.cs;
 
   if (!forceRefFilterFlag)
   {
-    // ³õÊ¼»¯Ö¡ÄÚÔ¤²â²ÎÊı, ÅĞ¶Ïµ±Ç°Ä£Ê½ÊÇË®Æ½»¹ÊÇ´¹Ö±£¬¼ÆËãÄ£Ê½½Ç¶ÈÆ«ÒÆ£¬ÅĞ¶ÏPDPCÊÇ·ñ¿ÉÓÃÒÔ¼°Ê¹ÓÃÊ²Ã´ÂË²¨·½·¨
+    // åˆå§‹åŒ–å¸§å†…é¢„æµ‹å‚æ•°, åˆ¤æ–­å½“å‰æ¨¡å¼æ˜¯æ°´å¹³è¿˜æ˜¯å‚ç›´ï¼Œè®¡ç®—æ¨¡å¼è§’åº¦åç§»ï¼Œåˆ¤æ–­PDPCæ˜¯å¦å¯ç”¨ä»¥åŠä½¿ç”¨ä»€ä¹ˆæ»¤æ³¢æ–¹æ³•
     initPredIntraParams(*cu.firstPU, area, *cs.sps); 
   }
 
-  Pel *refBufUnfiltered = m_refBuffer[area.compID][PRED_BUF_UNFILTERED]; // Î´ÂË²¨²Î¿¼ÏñËØ
-  Pel *refBufFiltered   = m_refBuffer[area.compID][PRED_BUF_FILTERED]; // ÂË²¨ºó²Î¿¼ÏñËØ
+  Pel *refBufUnfiltered = m_refBuffer[area.compID][PRED_BUF_UNFILTERED]; // æœªæ»¤æ³¢å‚è€ƒåƒç´ 
+  Pel *refBufFiltered   = m_refBuffer[area.compID][PRED_BUF_FILTERED]; // æ»¤æ³¢åå‚è€ƒåƒç´ 
 
-  // ÉèÖÃÉÏ±ßºÍ×ó±ß²Î¿¼ÏñËØµÄ³¤¶È
+  // è®¾ç½®ä¸Šè¾¹å’Œå·¦è¾¹å‚è€ƒåƒç´ çš„é•¿åº¦
   // m_leftRefLength = 2H;
   // m_topRefLength  = 2W;
   setReferenceArrayLengths( area );
 
   // ----- Step 1: unfiltered reference samples -----
-  // »ñÈ¡²Î¿¼ÏñËØ¡£·ÖÎö±ß½ç£¬ÅĞ¶Ï²Î¿¼ÏñËØÊÇ·ñ¿ÉÓÃ£¬Í³¼Æ¿ÉÓÃÏñËØÊıÄ¿
-  // ¸ù¾İÖØ½¨ÏñËØÌî³ä²Î¿¼ÏñËØ
-  // ÖØ½¨ÏñËØ¶¼²»¿ÉÓÃ£¬²Î¿¼ÏñËØÌî³ä1<<(bitdepth-1)£»È«²¿¿ÉÓÃÖ±½ÓÌî³ä
-  // ÓĞ²¿·Ö²»¿ÉÓÃµÄÊ±ºò»áÓÃ×î½üÁÚÏñËØ½øĞĞÌî³ä
+  // è·å–å‚è€ƒåƒç´ ã€‚åˆ†æè¾¹ç•Œï¼Œåˆ¤æ–­å‚è€ƒåƒç´ æ˜¯å¦å¯ç”¨ï¼Œç»Ÿè®¡å¯ç”¨åƒç´ æ•°ç›®
+  // æ ¹æ®é‡å»ºåƒç´ å¡«å……å‚è€ƒåƒç´ 
+  // é‡å»ºåƒç´ éƒ½ä¸å¯ç”¨ï¼Œå‚è€ƒåƒç´ å¡«å……1<<(bitdepth-1)ï¼›å…¨éƒ¨å¯ç”¨ç›´æ¥å¡«å……
+  // æœ‰éƒ¨åˆ†ä¸å¯ç”¨çš„æ—¶å€™ä¼šç”¨æœ€è¿‘é‚»åƒç´ è¿›è¡Œå¡«å……
   xFillReferenceSamples( cs.picture->getRecoBuf( area ), refBufUnfiltered, area, cu );
   // ----- Step 2: filtered reference samples -----
-  // Ê¹ÓÃ[1 2 1]/4¶Ô²Î¿¼ÏñËØÆ½»¬ÂË²¨
-  // 1. Ö¡ÄÚÔ¤²âÄ£Ê½¶Ô½ÇÄ£Ê½ºÍ»òplanarµÄ(-14, -12, -10, -6, 0(planar), 2, 34, 66, 72, 76, 78, 80)
-  // 2. CUÖĞ°üº¬ÏñËØÊı´óÓÚ32£¨width * height > 32£©
-  // 3. ½öÏŞÖÆÁÁ¶È·ÖÁ¿
-  // 4. ²Î¿¼ĞĞË÷ÒıÎª0£¬¼´Ê¹ÓÃµ¥²Î¿¼ĞĞ 
+  // ä½¿ç”¨[1 2 1]/4å¯¹å‚è€ƒåƒç´ å¹³æ»‘æ»¤æ³¢
+  // 1. å¸§å†…é¢„æµ‹æ¨¡å¼å¯¹è§’æ¨¡å¼å’Œæˆ–planarçš„(-14, -12, -10, -6, 0(planar), 2, 34, 66, 72, 76, 78, 80)
+  // 2. CUä¸­åŒ…å«åƒç´ æ•°å¤§äº32ï¼ˆwidth * height > 32ï¼‰
+  // 3. ä»…é™åˆ¶äº®åº¦åˆ†é‡
+  // 4. å‚è€ƒè¡Œç´¢å¼•ä¸º0ï¼Œå³ä½¿ç”¨å•å‚è€ƒè¡Œ 
 
-  // [1 2 1]/4 ²Î¿¼ÏñËØÂË²¨£¬²Î¿¼ÏñËØ¿ÉÄÜ¿çÔ½¶à¸ö¿é£¬¿éÓë¿éÖ®¼ä²»Á¬Ğø£¬¿é±ß½çÏñËØ¿ÉÄÜ²î¾à½Ï´ó
+  // [1 2 1]/4 å‚è€ƒåƒç´ æ»¤æ³¢ï¼Œå‚è€ƒåƒç´ å¯èƒ½è·¨è¶Šå¤šä¸ªå—ï¼Œå—ä¸å—ä¹‹é—´ä¸è¿ç»­ï¼Œå—è¾¹ç•Œåƒç´ å¯èƒ½å·®è·è¾ƒå¤§
   if( m_ipaParam.refFilterFlag || forceRefFilterFlag )
   {
     xFilterReferenceSamples( refBufUnfiltered, refBufFiltered, area, *cs.sps, cu.firstPU->multiRefIdx );
@@ -1003,7 +1003,7 @@ void IntraPrediction::initIntraPatternChTypeISP(const CodingUnit& cu, const Comp
 }
 
 
-// Ìî³äÎ´ÂË²¨µÄ²Î¿¼ÏñËØ
+// å¡«å……æœªæ»¤æ³¢çš„å‚è€ƒåƒç´ 
 void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBufUnfiltered, const CompArea &area, const CodingUnit &cu )
 {
   const ChannelType      chType = toChannelType( area.compID );
@@ -1011,7 +1011,7 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
   const SPS             &sps    = *cs.sps;
   const PreCalcValues   &pcv    = *cs.pcv;
 
-  // ²Î¿¼ĞĞË÷Òı£¬Y·ÖÁ¿ÓĞMRL£¬UV·ÖÁ¿Ö»ÓĞÒ»ĞĞ²Î¿¼
+  // å‚è€ƒè¡Œç´¢å¼•ï¼ŒYåˆ†é‡æœ‰MRLï¼ŒUVåˆ†é‡åªæœ‰ä¸€è¡Œå‚è€ƒ
   const int multiRefIdx         = (area.compID == COMPONENT_Y) ? cu.firstPU->multiRefIdx : 0; 
 
   const int  tuWidth            = area.width;
@@ -1020,42 +1020,42 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
   const int  predHSize          = m_leftRefLength;
   const int predStride = predSize + 1 + multiRefIdx; //2W + 1 + multiRefIdx
   m_refBufferStride[area.compID] = predStride;
-  // ²»ÒªÔÚ×îµ×²ãÒÆ¶¯£¨É«¶È²»·ÖÀë£©
+  // ä¸è¦åœ¨æœ€åº•å±‚ç§»åŠ¨ï¼ˆè‰²åº¦ä¸åˆ†ç¦»ï¼‰
   const bool noShift            = pcv.noChroma2x2 && area.width == 4; // don't shift on the lowest level (chroma not-split)
-  // ¿í¸ßµÄ×îĞ¡µ¥Î»
+  // å®½é«˜çš„æœ€å°å•ä½
   const int  unitWidth          = tuWidth  <= 2 && cu.ispMode && isLuma(area.compID) ? tuWidth  : pcv.minCUWidth  >> (noShift ? 0 : getComponentScaleX(area.compID, sps.getChromaFormatIdc()));
   const int  unitHeight         = tuHeight <= 2 && cu.ispMode && isLuma(area.compID) ? tuHeight : pcv.minCUHeight >> (noShift ? 0 : getComponentScaleY(area.compID, sps.getChromaFormatIdc()));
 
-  // ×ó±ßºÍÉÏ±ß¸÷ÄÜ·Ö³É¶àÉÙ¸ö²Î¿¼¿ì
+  // å·¦è¾¹å’Œä¸Šè¾¹å„èƒ½åˆ†æˆå¤šå°‘ä¸ªå‚è€ƒå¿«
   const int  totalAboveUnits    = (predSize + (unitWidth - 1)) / unitWidth;
   const int  totalLeftUnits     = (predHSize + (unitHeight - 1)) / unitHeight;
-  // ×Ü²Î¿¼¿é¸öÊı
+  // æ€»å‚è€ƒå—ä¸ªæ•°
   const int  totalUnits         = totalAboveUnits + totalLeftUnits + 1; //+1 for top-left
-  // ÕıÉÏ·½ºÍÕı×ó±ßÄÜ·Ö³É²Î¿¼¿é¸öÊı
+  // æ­£ä¸Šæ–¹å’Œæ­£å·¦è¾¹èƒ½åˆ†æˆå‚è€ƒå—ä¸ªæ•°
   const int  numAboveUnits      = std::max<int>( tuWidth / unitWidth, 1 );
   const int  numLeftUnits       = std::max<int>( tuHeight / unitHeight, 1 );
-  // ×óÏÂºÍÓÒÉÏ²Î¿¼¿é¸öÊı
+  // å·¦ä¸‹å’Œå³ä¸Šå‚è€ƒå—ä¸ªæ•°
   const int  numAboveRightUnits = totalAboveUnits - numAboveUnits;
   const int  numLeftBelowUnits  = totalLeftUnits - numLeftUnits;
 
   CHECK( numAboveUnits <= 0 || numLeftUnits <= 0 || numAboveRightUnits <= 0 || numLeftBelowUnits <= 0, "Size not supported" );
 
   // ----- Step 1: analyze neighborhood -----
-  // ·ÖÎö±ß½ç
+  // åˆ†æè¾¹ç•Œ
   const Position posLT          = area;
-  // ÓÒÉÏ×óÏÂ
+  // å³ä¸Šå·¦ä¸‹
   const Position posRT          = area.topRight();
   const Position posLB          = area.bottomLeft();
 
   bool  neighborFlags[4 * MAX_NUM_PART_IDXS_IN_CTU_WIDTH + 1];
-  int   numIntraNeighbor = 0;//¿ÉÓÃ²Î¿¼ÏñËØµÄ¸öÊı
+  int   numIntraNeighbor = 0;//å¯ç”¨å‚è€ƒåƒç´ çš„ä¸ªæ•°
 
-  // ¸øneighborFlagsÕâ¸öÊı×é³õÊ¼»¯totalUnits¸ö0£¬Ò²¾ÍÊÇÅĞ¶ÏtotalUnits¸ö±êÖ¾ÊÇ·ñ¿É²Î¿¼µÄ
+  // ç»™neighborFlagsè¿™ä¸ªæ•°ç»„åˆå§‹åŒ–totalUnitsä¸ª0ï¼Œä¹Ÿå°±æ˜¯åˆ¤æ–­totalUnitsä¸ªæ ‡å¿—æ˜¯å¦å¯å‚è€ƒçš„
   memset( neighborFlags, 0, totalUnits );
 
-  // ¼ÆËã×óÉÏ¡¢ÉÏ·½¡¢ÓÒÉÏ¡¢×ó²à¡¢×óÏÂ²Î¿¼ÏñËØ¿ÉÓÃµÄÊıÄ¿
+  // è®¡ç®—å·¦ä¸Šã€ä¸Šæ–¹ã€å³ä¸Šã€å·¦ä¾§ã€å·¦ä¸‹å‚è€ƒåƒç´ å¯ç”¨çš„æ•°ç›®
   neighborFlags[totalLeftUnits] = isAboveLeftAvailable( cu, chType, posLT );
-  numIntraNeighbor += neighborFlags[totalLeftUnits] ? 1 : 0; // ×óÉÏÖ»ÓĞÒ»¸ö
+  numIntraNeighbor += neighborFlags[totalLeftUnits] ? 1 : 0; // å·¦ä¸Šåªæœ‰ä¸€ä¸ª
   numIntraNeighbor += isAboveAvailable  ( cu, chType, posLT, numAboveUnits,      unitWidth,  (neighborFlags + totalLeftUnits + 1) );
   numIntraNeighbor += isAboveRightAvailable( cu, chType, posRT, numAboveRightUnits, unitWidth,  (neighborFlags + totalLeftUnits + 1 + numAboveUnits) );
   numIntraNeighbor += isLeftAvailable      ( cu, chType, posLT, numLeftUnits,       unitHeight, (neighborFlags + totalLeftUnits - 1) );
@@ -1063,14 +1063,14 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
 
 
   // ----- Step 2: fill reference samples (depending on neighborhood) -----
-  // Ìî³ä²Î¿¼ÏñËØ
+  // å¡«å……å‚è€ƒåƒç´ 
   const Pel*  srcBuf    = recoBuf.buf;
   const int   srcStride = recoBuf.stride;
         Pel*  ptrDst    = refBufUnfiltered;
   const Pel*  ptrSrc;
-  const Pel   valueDC   = 1 << (sps.getBitDepth( chType ) - 1); // ¶¼²»¿ÉÓÃÖ±½ÓÌî³ä1<<(bitDepth-1)
+  const Pel   valueDC   = 1 << (sps.getBitDepth( chType ) - 1); // éƒ½ä¸å¯ç”¨ç›´æ¥å¡«å……1<<(bitDepth-1)
 
-  if( numIntraNeighbor == 0 ) // ¶¼²»¿ÉÓÃÖ±½ÓÌî³ä 1<<(bitDepth-1)
+  if( numIntraNeighbor == 0 ) // éƒ½ä¸å¯ç”¨ç›´æ¥å¡«å…… 1<<(bitDepth-1)
   {
     // Fill border with DC value
     for (int j = 0; j <= predSize + multiRefIdx; j++)
@@ -1082,10 +1082,10 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
       ptrDst[i + predStride] = valueDC;
     }
   }
-  else if( numIntraNeighbor == totalUnits ) // Èç¹ûÈ«²¿¿ÉÓÃ
+  else if( numIntraNeighbor == totalUnits ) // å¦‚æœå…¨éƒ¨å¯ç”¨
   {
     // Fill top-left border and top and top right with rec. samples
-    // srcBufÖ¸Ïòµ±Ç°¿é×óÉÏ½Ç£¬ĞèÒª½«Ö¸ÕëÒÆµ½ÉÏÃæĞĞ»ò×ó±ßÁĞ£¬ Ö±½Ó½øĞĞ¸´ÖÆ¾ÍĞĞ
+    // srcBufæŒ‡å‘å½“å‰å—å·¦ä¸Šè§’ï¼Œéœ€è¦å°†æŒ‡é’ˆç§»åˆ°ä¸Šé¢è¡Œæˆ–å·¦è¾¹åˆ—ï¼Œ ç›´æ¥è¿›è¡Œå¤åˆ¶å°±è¡Œ
     ptrSrc = srcBuf - (1 + multiRefIdx) * srcStride - (1 + multiRefIdx);
     for (int j = 0; j <= predSize + multiRefIdx; j++)
     {
@@ -1096,22 +1096,22 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
       ptrDst[i + predStride] = ptrSrc[i * srcStride];
     }
   }
-  else // reference samples are partially available ²¿·Ö¿ÉÓÃ
+  else // reference samples are partially available éƒ¨åˆ†å¯ç”¨
   {
     // Fill top-left sample(s) if available
     ptrSrc = srcBuf - (1 + multiRefIdx) * srcStride - (1 + multiRefIdx);
     ptrDst = refBufUnfiltered;
     if (neighborFlags[totalLeftUnits]) 
     {
-      ptrDst[0] = ptrSrc[0]; // ÏÈÌî³ä×óÉÏ
+      ptrDst[0] = ptrSrc[0]; // å…ˆå¡«å……å·¦ä¸Š
       ptrDst[predStride] = ptrSrc[0];
       for (int i = 1; i <= multiRefIdx; i++) 
       {
-        ptrDst[i] = ptrSrc[i]; // Ìî³äD
-        ptrDst[i + predStride] = ptrSrc[i * srcStride]; // Ìî³äC
+        ptrDst[i] = ptrSrc[i]; // å¡«å……D
+        ptrDst[i + predStride] = ptrSrc[i * srcStride]; // å¡«å……C
       }
     }
-    // Ìî³äB
+    // å¡«å……B
     // Fill left & below-left samples if available (downwards)
     ptrSrc += (1 + multiRefIdx) * srcStride;
     ptrDst += (1 + multiRefIdx) + predStride;
@@ -1128,7 +1128,7 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
       ptrDst += unitHeight;
     }
     // Fill last below-left sample(s)
-    // Ìî³äA
+    // å¡«å……A
     if (neighborFlags[0])
     {
       int lastSample = (predHSize % unitHeight == 0) ? unitHeight : predHSize % unitHeight;
@@ -1137,7 +1137,7 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
         ptrDst[i] = ptrSrc[i * srcStride];
       }
     }
-    // Ìî³äE
+    // å¡«å……E
     // Fill above & above-right samples if available (left-to-right)
     ptrSrc = srcBuf - srcStride * (1 + multiRefIdx);
     ptrDst = refBufUnfiltered + 1 + multiRefIdx;
@@ -1153,7 +1153,7 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
       ptrSrc += unitWidth;
       ptrDst += unitWidth;
     }
-    // Ìî³äÓÒÉÏ
+    // å¡«å……å³ä¸Š
     // Fill last above-right sample(s)
     if (neighborFlags[totalUnits - 1])
     {
@@ -1165,7 +1165,7 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
     }
 
     // pad from first available down to the last below-left
-    // Èç¹û×óÏÂ½ÇÏñËØ²»¿ÉÓÃ£¬´Ó×óÏÂ½ÇÍùÉÏÑ°ÕÒ¿ÉÓÃµÄ²Î¿¼ÏñËØ
+    // å¦‚æœå·¦ä¸‹è§’åƒç´ ä¸å¯ç”¨ï¼Œä»å·¦ä¸‹è§’å¾€ä¸Šå¯»æ‰¾å¯ç”¨çš„å‚è€ƒåƒç´ 
     ptrDst = refBufUnfiltered;
     int lastAvailUnit = 0;
     if (!neighborFlags[0])
@@ -1177,7 +1177,7 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
       }
 
       // first available sample
-      // µÚÒ»¸ö¿ÉÓÃµÄÏñËØµÄÎ»ÖÃ
+      // ç¬¬ä¸€ä¸ªå¯ç”¨çš„åƒç´ çš„ä½ç½®
       int firstAvailRow = -1;
       int firstAvailCol = 0;
       if (firstAvailUnit < totalLeftUnits)
@@ -1192,21 +1192,21 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
       {
         firstAvailCol = (firstAvailUnit - totalLeftUnits - 1) * unitWidth + 1 + multiRefIdx;
       }
-      // ¸ù¾İÎ»ÖÃÕÒµ½µÚÒ»¸ö¿ÉÓÃ²Î¿¼ÏñËØ
+      // æ ¹æ®ä½ç½®æ‰¾åˆ°ç¬¬ä¸€ä¸ªå¯ç”¨å‚è€ƒåƒç´ 
       const Pel firstAvailSample = ptrDst[firstAvailRow < 0 ? firstAvailCol : firstAvailRow + predStride];
 
       // last sample below-left (n.a.)
-      // ×óÏÂ×îºóÒ»¸ö²Î¿¼ÏñËØ
+      // å·¦ä¸‹æœ€åä¸€ä¸ªå‚è€ƒåƒç´ 
       int lastRow = predHSize + multiRefIdx;
 
       // fill left column
-      // ½«µÚÒ»¸ö¿ÉÓÃÏñËØÏÂµÄÏñËØ¶¼ÓÃ¸ÃÖµÌî³ä
+      // å°†ç¬¬ä¸€ä¸ªå¯ç”¨åƒç´ ä¸‹çš„åƒç´ éƒ½ç”¨è¯¥å€¼å¡«å……
       for (int i = lastRow; i > firstAvailRow; i--)
       {
         ptrDst[i + predStride] = firstAvailSample;
       }
       // fill top row
-      // Ìî³äÉÏÒ»ĞĞ²Î¿¼ÏñËØ
+      // å¡«å……ä¸Šä¸€è¡Œå‚è€ƒåƒç´ 
       if (firstAvailCol > 0)
       {
         for (int j = 0; j < firstAvailCol; j++)
@@ -1218,14 +1218,14 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
     }
 
     // pad all other reference samples.
-    // Ìî³äÊ£ÓàµÄ²Î¿¼ÏñËØ
+    // å¡«å……å‰©ä½™çš„å‚è€ƒåƒç´ 
     int currUnit = lastAvailUnit + 1;
     while (currUnit < totalUnits)
     {
-      if (!neighborFlags[currUnit]) // samples not available ÏñËØ²»¿ÉÓÃ
+      if (!neighborFlags[currUnit]) // samples not available åƒç´ ä¸å¯ç”¨
       {
         // last available sample
-        // Ñ°ÕÒ×î½üµÄ¿ÉÓÃ²Î¿¼ÏñËØ
+        // å¯»æ‰¾æœ€è¿‘çš„å¯ç”¨å‚è€ƒåƒç´ 
         int lastAvailRow = -1;
         int lastAvailCol = 0;
         if (lastAvailUnit < totalLeftUnits)
@@ -1240,11 +1240,11 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
         {
           lastAvailCol = (lastAvailUnit - totalLeftUnits) * unitWidth + multiRefIdx;
         }
-        // ×î½ü¿ÉÓÃ²Î¿¼ÏñËØ
+        // æœ€è¿‘å¯ç”¨å‚è€ƒåƒç´ 
         const Pel lastAvailSample = ptrDst[lastAvailRow < 0 ? lastAvailCol : lastAvailRow + predStride];
 
         // fill current unit with last available sample
-        // ×î½ü¿ÉÓÃ²Î¿¼ÏñËØÌî³ä
+        // æœ€è¿‘å¯ç”¨å‚è€ƒåƒç´ å¡«å……
         if (currUnit < totalLeftUnits)
         {
           for (int i = lastAvailRow - 1; i >= lastAvailRow - unitHeight; i--)
@@ -1279,10 +1279,10 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
 }
 
 
-// [1 2 1]/4²Î¿¼ÏñËØÆ½»¬ÂË²¨
+// [1 2 1]/4å‚è€ƒåƒç´ å¹³æ»‘æ»¤æ³¢
 void IntraPrediction::xFilterReferenceSamples(const Pel *refBufUnfiltered, Pel *refBufFiltered, const CompArea &area, const SPS &sps, int multiRefIdx)
 {
-  // É«¶ÈÖ»ÓÃÒ»¸ö²Î¿¼ĞĞ
+  // è‰²åº¦åªç”¨ä¸€ä¸ªå‚è€ƒè¡Œ
   if (area.compID != COMPONENT_Y)
   {
     multiRefIdx = 0;
@@ -1291,32 +1291,32 @@ void IntraPrediction::xFilterReferenceSamples(const Pel *refBufUnfiltered, Pel *
   const int predHSize = m_leftRefLength + multiRefIdx;// 2H+multiRefIdx
   const size_t predStride = m_refBufferStride[area.compID]; 
 
-  // ×óÉÏ½ÇµÄÏñËØ
+  // å·¦ä¸Šè§’çš„åƒç´ 
   const Pel topLeft =
     (refBufUnfiltered[0] + refBufUnfiltered[1] + refBufUnfiltered[predStride] + refBufUnfiltered[predStride + 1] + 2)
     >> 2;
-  // ×óÉÏ½ÇÂË²¨ºóÏñËØÖ±½ÓÓÃÔ­Ê¼µÄ£¬ÒòÎªÃ»·¨ÂË²¨
+  // å·¦ä¸Šè§’æ»¤æ³¢ååƒç´ ç›´æ¥ç”¨åŸå§‹çš„ï¼Œå› ä¸ºæ²¡æ³•æ»¤æ³¢
   refBufFiltered[0] = topLeft;
 
-  // ÂË²¨
+  // æ»¤æ³¢
   for (int i = 1; i < predSize; i++)
   {
     refBufFiltered[i] = (refBufUnfiltered[i - 1] + 2 * refBufUnfiltered[i] + refBufUnfiltered[i + 1] + 2) >> 2;
   }
-  // ×îÓÒÉÏ½ÇÏñËØ
+  // æœ€å³ä¸Šè§’åƒç´ 
   refBufFiltered[predSize] = refBufUnfiltered[predSize];
 
   refBufFiltered += predStride;
   refBufUnfiltered += predStride;
 
-  // ×î×óÉÏ½ÇÔªËØ
+  // æœ€å·¦ä¸Šè§’å…ƒç´ 
   refBufFiltered[0] = topLeft;
-  // ÂË²¨
+  // æ»¤æ³¢
   for (int i = 1; i < predHSize; i++)
   {
     refBufFiltered[i] = (refBufUnfiltered[i - 1] + 2 * refBufUnfiltered[i] + refBufUnfiltered[i + 1] + 2) >> 2;
   }
-  // ×î×óÏÂ½ÇÔªËØ
+  // æœ€å·¦ä¸‹è§’å…ƒç´ 
   refBufFiltered[predHSize] = refBufUnfiltered[predHSize];
 }
 
@@ -1932,8 +1932,8 @@ void IntraPrediction::initIntraMip( const PredictionUnit &pu, const CompArea &ar
 
   // prepare input (boundary) data for prediction
   CHECK( m_ipaParam.refFilterFlag, "ERROR: unfiltered refs expected for MIP" );
-  // MIPÊ¹ÓÃÎ´ÂË²¨µÄ²Î¿¼ÏñËØ
-  Pel       *ptrSrc     = getPredictorPtr(area.compID); // »ñÈ¡²Î¿¼ÏñËØ
+  // MIPä½¿ç”¨æœªæ»¤æ³¢çš„å‚è€ƒåƒç´ 
+  Pel       *ptrSrc     = getPredictorPtr(area.compID); // è·å–å‚è€ƒåƒç´ 
   const int  srcStride  = m_refBufferStride[area.compID];
   const int  srcHStride = 2;
 
@@ -1998,7 +1998,7 @@ void IntraPrediction::reorderPLT(CodingStructure& cs, Partitioner& partitioner, 
   {
     curPLTpred[idx] = false;
   }
-  //²éÕÒµ±Ç°PLTÖĞÊÇ·ñÓĞ¸´ÓÃPrePLTµÄ
+  //æŸ¥æ‰¾å½“å‰PLTä¸­æ˜¯å¦æœ‰å¤ç”¨PrePLTçš„
   for (int predidx = 0; predidx < cs.prevPLT.curPLTSize[compBegin]; predidx++)
   {
     bool match = false;
@@ -2021,7 +2021,7 @@ void IntraPrediction::reorderPLT(CodingStructure& cs, Partitioner& partitioner, 
         break;
       }
     }
-    //°Ñ¸´ÓÃµÄ¼ÓÈëµ½curPLTtmp
+    //æŠŠå¤ç”¨çš„åŠ å…¥åˆ°curPLTtmp
     if (match)
     {
       cu.reuseflag[compBegin][predidx] = true;
@@ -2048,7 +2048,7 @@ void IntraPrediction::reorderPLT(CodingStructure& cs, Partitioner& partitioner, 
   cu.reusePLTSize[compBegin] = reusePLTSizetmp;
   for (int curidx = 0; curidx < cu.curPLTSize[compBegin]; curidx++)
   {
-    //Èç¹û²»ÄÜ¸´ÓÃ£¨²»ÄÜ´ÓpreÖĞÍÆµ¼³öÀ´£©ÔÙ¼ÓÈëµ½curPLTtmpÖĞ Ïàµ±ÓÚcurPLTtmpÇ°ÃæÎª¿ÉÒÔ¸´ÓÃµÄ ºóÃæ²»¿É ·½±ã¸´ÓÃ±êÖ¾±àÂë
+    //å¦‚æœä¸èƒ½å¤ç”¨ï¼ˆä¸èƒ½ä»preä¸­æ¨å¯¼å‡ºæ¥ï¼‰å†åŠ å…¥åˆ°curPLTtmpä¸­ ç›¸å½“äºcurPLTtmpå‰é¢ä¸ºå¯ä»¥å¤ç”¨çš„ åé¢ä¸å¯ æ–¹ä¾¿å¤ç”¨æ ‡å¿—ç¼–ç 
     if (!curPLTpred[curidx])
     {
       if( cu.isLocalSepTree() )
@@ -2078,7 +2078,7 @@ void IntraPrediction::reorderPLT(CodingStructure& cs, Partitioner& partitioner, 
     }
   }
   assert(pltSizetmp == cu.curPLTSize[compBegin]);
-  //°ÑcurPLTtmpÖØĞÂ¸³Öµ¸øcurPLT
+  //æŠŠcurPLTtmpé‡æ–°èµ‹å€¼ç»™curPLT
   for (int curidx = 0; curidx < cu.curPLTSize[compBegin]; curidx++)
   {
     if( cu.isLocalSepTree() )

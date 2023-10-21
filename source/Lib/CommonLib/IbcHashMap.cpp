@@ -173,7 +173,7 @@ uint32_t IbcHashMap::xxComputeCrc32c16bit(uint32_t crc, const Pel pel)
   const void *buf = &pel;
   const uint8_t *p = (const uint8_t *)buf;
   size_t size = 2;
-  //CRCµ±Ç°½á¹ûÒì»òµ±Ç°ÏñËØÖµ×îºóÈ¡×îµÍµÄ8Î»£¬Í¨¹ı²é±íµÃµ½Ò»¸öÖµ£¬Õâ¸öÖµÔÙÓëCRCÓÒÒÆ8Î»µÄÖµÒì»ò
+  //CRCå½“å‰ç»“æœå¼‚æˆ–å½“å‰åƒç´ å€¼æœ€åå–æœ€ä½çš„8ä½ï¼Œé€šè¿‡æŸ¥è¡¨å¾—åˆ°ä¸€ä¸ªå€¼ï¼Œè¿™ä¸ªå€¼å†ä¸CRCå³ç§»8ä½çš„å€¼å¼‚æˆ–
   while (size--)
   {
     crc = crc32Table[(crc ^ *p++) & 0xff] ^ (crc >> 8);
@@ -209,7 +209,7 @@ void IbcHashMap::xxBuildPicHashMap(const PelUnitBuf& pic)
   const Pel* pelCr = NULL;
 
   Position pos;
-  //Öğ¸öÏñËØµã½øĞĞ¼ÆËãHash£¬²¢½¨Á¢hash2posºÍpos2hashÁ½¸öÊı¾İ
+  //é€ä¸ªåƒç´ ç‚¹è¿›è¡Œè®¡ç®—Hashï¼Œå¹¶å»ºç«‹hash2poså’Œpos2hashä¸¤ä¸ªæ•°æ®
   for (pos.y = 0; pos.y + MIN_PU_SIZE <= pic.Y().height; pos.y++)
   {
     // row pointer
@@ -276,8 +276,8 @@ bool IbcHashMap::ibcHashMatch(const Area& lumaArea, std::vector<Position>& cand,
   size_t minSize = MAX_UINT;
   unsigned int targetHashOneBlock = 0;
   Position targetBlockOffsetInCu(0, 0);
-  //IBCHashÒÔ×îĞ¡PU×îÎª¼ÆËãµ¥Ôª
-  //±éÀúÃ¿¸öHashÆ¥Åä¿éµ¥Ôª¶ÔÓ¦µÄHash±ísize£¬µÃµ½×îĞ¡size
+  //IBCHashä»¥æœ€å°PUæœ€ä¸ºè®¡ç®—å•å…ƒ
+  //éå†æ¯ä¸ªHashåŒ¹é…å—å•å…ƒå¯¹åº”çš„Hashè¡¨sizeï¼Œå¾—åˆ°æœ€å°size
   for (SizeType y = 0; y < lumaArea.height && minSize > 1; y += MIN_PU_SIZE)
   {
     for (SizeType x = 0; x < lumaArea.width && minSize > 1; x += MIN_PU_SIZE)
@@ -291,7 +291,7 @@ bool IbcHashMap::ibcHashMatch(const Area& lumaArea, std::vector<Position>& cand,
       }
     }
   }
-  //×îÉÙÆ¥Åä¿éµÄÄÇ¸ö¿éµÄHashÖµµÄÎ»ÖÃhash±í
+  //æœ€å°‘åŒ¹é…å—çš„é‚£ä¸ªå—çš„Hashå€¼çš„ä½ç½®hashè¡¨
   if (m_hash2Pos[targetHashOneBlock].size() > 1)
   {
     std::vector<Position>& candOneBlock = m_hash2Pos[targetHashOneBlock];
@@ -302,10 +302,10 @@ bool IbcHashMap::ibcHashMatch(const Area& lumaArea, std::vector<Position>& cand,
       Position topLeft = refBlockPos->offset(-targetBlockOffsetInCu.x, -targetBlockOffsetInCu.y);
       Position bottomRight = topLeft.offset(lumaArea.width - 1, lumaArea.height - 1);
       bool wholeBlockMatch = true;
-      //ÓÃĞ¡µÄ¿éÆ¥Åäµ½µÄ´ó¿éÊÇ·ñËùÓĞĞ¡¿éµÄHash whole match
+      //ç”¨å°çš„å—åŒ¹é…åˆ°çš„å¤§å—æ˜¯å¦æ‰€æœ‰å°å—çš„Hash whole match
       if (lumaArea.width > MIN_PU_SIZE || lumaArea.height > MIN_PU_SIZE)
       {
-        //·¶Î§¼ì²â
+        //èŒƒå›´æ£€æµ‹
         if (!cs.isDecomp(bottomRight, CHANNEL_TYPE_LUMA) || bottomRight.x >= m_picWidth || bottomRight.y >= m_picHeight || topLeft.x < 0 || topLeft.y < 0)
         {
           continue;
@@ -319,17 +319,17 @@ bool IbcHashMap::ibcHashMatch(const Area& lumaArea, std::vector<Position>& cand,
           }
         }
       }
-      //Èç¹ûµ±Ç°¿é¾ÍÊÇ×îĞ¡¿é£¬ÄÇÃ´ÏÔÈ»Æ¥Åä
+      //å¦‚æœå½“å‰å—å°±æ˜¯æœ€å°å—ï¼Œé‚£ä¹ˆæ˜¾ç„¶åŒ¹é…
       else
       {
         CHECK(topLeft != *refBlockPos, "4x4 target block should not have offset!");
-        //Èç¹û³¬³ö·¶Î§ ÄÇÃ´Õâ¸ö¿é²»ÄÜÓÃ
+        //å¦‚æœè¶…å‡ºèŒƒå›´ é‚£ä¹ˆè¿™ä¸ªå—ä¸èƒ½ç”¨
         if (abs(topLeft.x - lumaArea.x) > searchRange4SmallBlk || abs(topLeft.y - lumaArea.y) > searchRange4SmallBlk || !cs.isDecomp(bottomRight, CHANNEL_TYPE_LUMA))
         {
           continue;
         }
       }
-      //ÍêÃÀÆ¥ÅäÁË ¼ÓÈëµ½candÄÚ
+      //å®Œç¾åŒ¹é…äº† åŠ å…¥åˆ°candå†…
       if (wholeBlockMatch)
       {
         cand.push_back(topLeft);

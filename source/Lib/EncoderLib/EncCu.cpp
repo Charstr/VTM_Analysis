@@ -1320,8 +1320,8 @@ void EncCu::xCheckModeSplit(CodingStructure *&tempCS, CodingStructure *&bestCS, 
   // QG(Quantization group): 把一帧图像划分为固定大小的正方形像素块，大小由PPS指定，且必须处于CTU和最小CU之间，
   //  同一个QG内的所有非零系数的CU共享一个QP; HEVC中使用相邻QG的信息预测当前QG内的QP, 
   // predQP =(QP_A + Qp_B + 1) >> 1
-  bool qgEnableChildren       = partitioner.currQgEnable();       // QG possible at children level
-  //bool qgEnableChildren = partitioner.currQgEnable(); // QG possible at children level
+  //bool qgEnableChildren       = partitioner.currQgEnable();       // QG possible at children level
+  bool qgEnableChildren = partitioner.currQgEnable(); // QG possible at children level
   bool qgChromaEnableChildren = partitioner.currQgChromaEnable(); // Chroma QG possible at children level
   
   //这是一个指向当前上下文的指针变量，++表示下一个变量，而CU在做了进一步划分后，深度也会加1，进而当前上下文也会改变。一开始会有初始化，后面可能会有修改

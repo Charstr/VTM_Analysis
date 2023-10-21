@@ -365,9 +365,9 @@ void QTBTPartitioner::splitCurrArea( const PartSplit split, const CodingStructur
 
 void QTBTPartitioner::canSplit( const CodingStructure &cs, bool& canNo, bool& canQt, bool& canBh, bool& canBv, bool& canTh, bool& canTv )
 {
-  // 隐式分割设置
+  // 闅愬紡鍒嗗壊璁剧疆
   const PartSplit implicitSplit = m_partStack.back().checkdIfImplicit ? m_partStack.back().implicitSplit : getImplicitSplit( cs );
-  // maxBT深度是要加上当前隐式分割的BT深度
+  // maxBT娣卞害鏄鍔犱笂褰撳墠闅愬紡鍒嗗壊鐨凚T娣卞害
   const unsigned maxBTD         = cs.pcv->getMaxBtDepth( *cs.slice, chType ) + currImplicitBtDepth;
   const unsigned maxBtSize      = cs.pcv->getMaxBtSize ( *cs.slice, chType );
   const unsigned minBtSize      = cs.pcv->getMinBtSize ( *cs.slice, chType );

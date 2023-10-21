@@ -65,18 +65,18 @@ void MatrixIntraPrediction::prepareInputForPred(const CPelBuf &pSrc, const Area 
   m_component = compId;
 
   // Step 1: Save block size and calculate dependent values
-  // ±£´æ¿é´óĞ¡²¢¼ÆËãMIPÏà¹Ø²ÎÊı
+  // ä¿å­˜å—å¤§å°å¹¶è®¡ç®—MIPç›¸å…³å‚æ•°
   initPredBlockParams(block);
 
   // Step 2: Get the input data (left and top reference samples)
-  // »ñÈ¡ÊäÈëÏñËØ(×óºÍÉÏ²Î¿¼ÏñËØ)
-  // »ñÈ¡ÉÏ·½²Î¿¼ÏñËØ
+  // è·å–è¾“å…¥åƒç´ (å·¦å’Œä¸Šå‚è€ƒåƒç´ )
+  // è·å–ä¸Šæ–¹å‚è€ƒåƒç´ 
   m_refSamplesTop.resize(block.width);
   for (int x = 0; x < block.width; x++)
   {
     m_refSamplesTop[x] = pSrc.at(x + 1, 0);
   }
-  // ×ó±ß²Î¿¼ÏñËØ
+  // å·¦è¾¹å‚è€ƒåƒç´ 
   m_refSamplesLeft.resize(block.height);
   for (int y = 0; y < block.height; y++)
   {
@@ -84,26 +84,26 @@ void MatrixIntraPrediction::prepareInputForPred(const CPelBuf &pSrc, const Area 
   }
 
   // Step 3: Compute the reduced boundary via Haar-downsampling (input for the prediction)
-  // Step 3: Í¨¹ıHaarÏÂ²ÉÑù¼ÆËãËõ¼õ±ß½ç£¨Ô¤²âÊäÈë£©
-  // ÏÂ²ÉÑùºóÊäÈëÏòÁ¿µÄ³ß´çÎª4»òÕß8(4x4ÊÇ4£¬ÆäÓàµÄÊÇ8)
+  // Step 3: é€šè¿‡Haarä¸‹é‡‡æ ·è®¡ç®—ç¼©å‡è¾¹ç•Œï¼ˆé¢„æµ‹è¾“å…¥ï¼‰
+  // ä¸‹é‡‡æ ·åè¾“å…¥å‘é‡çš„å°ºå¯¸ä¸º4æˆ–è€…8(4x4æ˜¯4ï¼Œå…¶ä½™çš„æ˜¯8)
   const int inputSize = 2 * m_reducedBdrySize;
-  // ²»ĞèÒª×ªÖÃÊ±£¬ÏÂ²ÉÑùÏñËØµÄË³Ğò£ºÏÈÉÏºó×ó
+  // ä¸éœ€è¦è½¬ç½®æ—¶ï¼Œä¸‹é‡‡æ ·åƒç´ çš„é¡ºåºï¼šå…ˆä¸Šåå·¦
   m_reducedBoundary          .resize( inputSize );
-  // ×ªÖÃÊ±£¬ÏÂ²ÉÑùÏñËØµÄË³Ğò£ºÏÈ×óºóÉÏ
+  // è½¬ç½®æ—¶ï¼Œä¸‹é‡‡æ ·åƒç´ çš„é¡ºåºï¼šå…ˆå·¦åä¸Š
   m_reducedBoundaryTransposed.resize( inputSize );
 
-  // ÏÂ²ÉÑù
+  // ä¸‹é‡‡æ ·
   int* const topReduced = m_reducedBoundary.data();
   boundaryDownsampling1D( topReduced, m_refSamplesTop.data(), block.width, m_reducedBdrySize );
 
   int* const leftReduced = m_reducedBoundary.data() + m_reducedBdrySize;
   boundaryDownsampling1D( leftReduced, m_refSamplesLeft.data(), block.height, m_reducedBdrySize );
 
-  // ×ªÖÃ¾ÍÊÇÉÏ+×óµÄË³Ğò±ä³É×ó+ÉÏµÄË³Ğò£¬¸ù¾İÄ£Ê½ºÅ½øĞĞµ÷Õû
+  // è½¬ç½®å°±æ˜¯ä¸Š+å·¦çš„é¡ºåºå˜æˆå·¦+ä¸Šçš„é¡ºåºï¼Œæ ¹æ®æ¨¡å¼å·è¿›è¡Œè°ƒæ•´
   int* const leftReducedTransposed = m_reducedBoundaryTransposed.data();
   int* const topReducedTransposed  = m_reducedBoundaryTransposed.data() + m_reducedBdrySize;
 
-  // ×óºÍÉÏÏÂ²ÉÑù²¢×ªÖÃ
+  // å·¦å’Œä¸Šä¸‹é‡‡æ ·å¹¶è½¬ç½®
   for( int x = 0; x < m_reducedBdrySize; x++ )
   {
     topReducedTransposed[x] = topReduced[x];
@@ -114,7 +114,7 @@ void MatrixIntraPrediction::prepareInputForPred(const CPelBuf &pSrc, const Area 
   }
 
   // Step 4: Rebase the reduced boundary
-  // ÍÆµ¼¾ØÕó³Ë·¨ÊäÈëÏòÁ¿p£¬mipSizeId=0/1ºÍmipSizeId=2µÄÍÆµ¼·½·¨²»Ò»Ñù
+  // æ¨å¯¼çŸ©é˜µä¹˜æ³•è¾“å…¥å‘é‡pï¼ŒmipSizeId=0/1å’ŒmipSizeId=2çš„æ¨å¯¼æ–¹æ³•ä¸ä¸€æ ·
   m_inputOffset       = m_reducedBoundary[0];
   m_inputOffsetTransp = m_reducedBoundaryTransposed[0];
 
@@ -133,27 +133,27 @@ void MatrixIntraPrediction::predBlock(int *const result, const int modeIdx, cons
 {
   CHECK(m_component != compId, "Boundary has not been prepared for this component.");
 
-  // ÊÇ·ñĞèÒªÉÏ²ÉÑù
+  // æ˜¯å¦éœ€è¦ä¸Šé‡‡æ ·
   const bool needUpsampling = ( m_upsmpFactorHor > 1 ) || ( m_upsmpFactorVer > 1 );
 
-  // ¸ù¾İmipSizeId(CUµÄ´óĞ¡)Ñ¡ÔñMIP¾ØÕó
+  // æ ¹æ®mipSizeId(CUçš„å¤§å°)é€‰æ‹©MIPçŸ©é˜µ
   // 4x4:   [16, 16, 4] 
   // 8x8:   [8, 16, 8]
   // 16x16: [6, 64, 7]
   const uint8_t* matrix = getMatrixData(modeIdx);
 
-  // ´æ´¢ÏÂ²ÉÑùµÄÔ¤²âÏñËØ
+  // å­˜å‚¨ä¸‹é‡‡æ ·çš„é¢„æµ‹åƒç´ 
   static_vector<int, MIP_MAX_REDUCED_OUTPUT_SAMPLES> bufReducedPred( m_reducedPredSize * m_reducedPredSize );
 
   int* const       reducedPred     = needUpsampling ? bufReducedPred.data() : result;
-  // ¸ù¾İÊÇ·ñ×ªÖÃ»ñµÃËõ¼õ±ß½çÏñËØÏòÁ¿
+  // æ ¹æ®æ˜¯å¦è½¬ç½®è·å¾—ç¼©å‡è¾¹ç•Œåƒç´ å‘é‡
   const int* const reducedBoundary = transpose ? m_reducedBoundaryTransposed.data() : m_reducedBoundary.data();
-  // ½øĞĞ¾ØÕó³Ë·¨¼ÆËãËõ¼õÔ¤²âÏñËØ
+  // è¿›è¡ŒçŸ©é˜µä¹˜æ³•è®¡ç®—ç¼©å‡é¢„æµ‹åƒç´ 
   computeReducedPred(reducedPred, reducedBoundary, matrix, transpose, bitDepth);
-  // Èç¹ûĞèÒªÉÏ²ÉÑù
+  // å¦‚æœéœ€è¦ä¸Šé‡‡æ ·
   if( needUpsampling )
   {
-    // ÉÏ²ÉÑùº¯Êı£¬ÀûÓÃËõ¼õÔ¤²âÏñËØ»ñµÃÕû¸ö¿éµÄÔ¤²âÏñËØ
+    // ä¸Šé‡‡æ ·å‡½æ•°ï¼Œåˆ©ç”¨ç¼©å‡é¢„æµ‹åƒç´ è·å¾—æ•´ä¸ªå—çš„é¢„æµ‹åƒç´ 
     predictionUpsampling( result, reducedPred );
   }
 }
@@ -167,25 +167,25 @@ void MatrixIntraPrediction::initPredBlockParams(const Size& block)
 
   // init reduced boundary size
 
-  // ³õÊ¼Ëõ¼õ±ß½ç³ß´ç
-  // ¶ÔÓÚ4x4µÄ¿é¿í¶ÈºÍ¸ß¶È·Ö±ğÏÂ²ÉÑùÎª2¸öÏñËØ
-  // ¶ÔÓÚÆäÓà³ß´çµÄ¿é¿í¶ÈºÍ¸ß¶È·Ö±ğËõ¼õÎª4¸öÏñËØ
+  // åˆå§‹ç¼©å‡è¾¹ç•Œå°ºå¯¸
+  // å¯¹äº4x4çš„å—å®½åº¦å’Œé«˜åº¦åˆ†åˆ«ä¸‹é‡‡æ ·ä¸º2ä¸ªåƒç´ 
+  // å¯¹äºå…¶ä½™å°ºå¯¸çš„å—å®½åº¦å’Œé«˜åº¦åˆ†åˆ«ç¼©å‡ä¸º4ä¸ªåƒç´ 
   
   m_reducedBdrySize = (m_sizeId == 0) ? 2 : 4;
 
   // init reduced prediction size
-  // ³õÊ¼»¯Ëõ¼õÔ¤²âºóµÄ³ß´ç
-  // ¶ÔÓÚmipSizeId = 0¡¢1µÄ¿é(4x4, 4xN, Nx4, 8x8)£¬MIPÔ¤²âºóÊä³ö4x4µÄ¿é
-  // ¶ÔÓÚmipSizeId = 2µÄ¿é£¬MIPÔ¤²âºóÊä³ö8x8µÄ¿é
+  // åˆå§‹åŒ–ç¼©å‡é¢„æµ‹åçš„å°ºå¯¸
+  // å¯¹äºmipSizeId = 0ã€1çš„å—(4x4, 4xN, Nx4, 8x8)ï¼ŒMIPé¢„æµ‹åè¾“å‡º4x4çš„å—
+  // å¯¹äºmipSizeId = 2çš„å—ï¼ŒMIPé¢„æµ‹åè¾“å‡º8x8çš„å—
   m_reducedPredSize = ( m_sizeId < 2 ) ? 4 : 8;
 
 
 
   // init upsampling factors
-  // ÉÏ²ÉÑùÒò×Ó£¬¼´Ò»¸öÊä³öÏñËØÉú³É¼¸¸ö×îÖÕµÄÔ¤²âÏñËØ
+  // ä¸Šé‡‡æ ·å› å­ï¼Œå³ä¸€ä¸ªè¾“å‡ºåƒç´ ç”Ÿæˆå‡ ä¸ªæœ€ç»ˆçš„é¢„æµ‹åƒç´ 
   m_upsmpFactorHor = m_blockSize.width  / m_reducedPredSize;
   m_upsmpFactorVer = m_blockSize.height / m_reducedPredSize;
-  // ³õÊ¼ÉÏ²ÉÑùÒò×Ó
+  // åˆå§‹ä¸Šé‡‡æ ·å› å­
   CHECKD( (m_upsmpFactorHor < 1) || ((m_upsmpFactorHor & (m_upsmpFactorHor - 1)) != 0), "Need power of two horizontal upsampling factor." );
   CHECKD( (m_upsmpFactorVer < 1) || ((m_upsmpFactorVer & (m_upsmpFactorVer - 1)) != 0), "Need power of two vertical upsampling factor." );
 }
@@ -194,7 +194,7 @@ void MatrixIntraPrediction::initPredBlockParams(const Size& block)
 
 void MatrixIntraPrediction::boundaryDownsampling1D(int* reducedDst, const int* const fullSrc, const SizeType srcLen, const SizeType dstLen)
 {
-  // ÏÂ²ÉÑù³ß´çĞ¡ÓÚÊµ¼Ê³ß´ç²Å½øĞĞ£¬·ñÔòÖ±½Ó¸´ÖÆ¾Í¿ÉÒÔ¡£ÏÂ²ÉÑùÏàµ±ÓÚÇóÆ½¾ù
+  // ä¸‹é‡‡æ ·å°ºå¯¸å°äºå®é™…å°ºå¯¸æ‰è¿›è¡Œï¼Œå¦åˆ™ç›´æ¥å¤åˆ¶å°±å¯ä»¥ã€‚ä¸‹é‡‡æ ·ç›¸å½“äºæ±‚å¹³å‡
   if (dstLen < srcLen)
   {
     // Create reduced boundary by downsampling
@@ -216,7 +216,7 @@ void MatrixIntraPrediction::boundaryDownsampling1D(int* reducedDst, const int* c
   else
   {
     // Copy boundary if no downsampling is needed
-    for (SizeType i = 0; i < dstLen; ++i) // ²»ĞèÒªÏÂ²ÉÑùÖ±½Ó¸´ÖÆ±ß½ç
+    for (SizeType i = 0; i < dstLen; ++i) // ä¸éœ€è¦ä¸‹é‡‡æ ·ç›´æ¥å¤åˆ¶è¾¹ç•Œ
     {
       reducedDst[i] = fullSrc[i];
     }
@@ -236,23 +236,23 @@ void MatrixIntraPrediction::predictionUpsampling1D(int* const dst, const int* co
   const int roundingOffset = 1 << (log2UpsmpFactor - 1);
 
   SizeType idxOrthDim = 0;
-  const int* srcLine = src;//¾ØÕó³Ë·¨Êä³ö»òË®Æ½²åÖµ½á¹û
+  const int* srcLine = src;//çŸ©é˜µä¹˜æ³•è¾“å‡ºæˆ–æ°´å¹³æ’å€¼ç»“æœ
   int* dstLine = dst;
-  const int* bndryLine = bndry + bndryStep - 1;//±ß½ç²Î¿¼ÏñËØ
+  const int* bndryLine = bndry + bndryStep - 1;//è¾¹ç•Œå‚è€ƒåƒç´ 
   while( idxOrthDim < srcSizeOrthDim )
   {
     SizeType idxUpsmpDim = 0;
-    const int* before = bndryLine;//Ç°Ò»¸ö²Î¿¼ÏñËØ
-    const int* behind = srcLine;//ºóÒ»¸ö²Î¿¼ÏñËØ
+    const int* before = bndryLine;//å‰ä¸€ä¸ªå‚è€ƒåƒç´ 
+    const int* behind = srcLine;//åä¸€ä¸ªå‚è€ƒåƒç´ 
     int* currDst = dstLine;
     while( idxUpsmpDim < srcSizeUpsmpDim )
     {
-      SizeType pos = 1;//¿ØÖÆµ±Ç°²åÖµµÄÎ»ÖÃ£¬½«²åÖµ½á¹ûºÍ¾ØÕó³Ë·¨½á¹û·Åµ½¸÷×ÔÏàÓ¦µÄÎ»ÖÃÉÏ
+      SizeType pos = 1;//æ§åˆ¶å½“å‰æ’å€¼çš„ä½ç½®ï¼Œå°†æ’å€¼ç»“æœå’ŒçŸ©é˜µä¹˜æ³•ç»“æœæ”¾åˆ°å„è‡ªç›¸åº”çš„ä½ç½®ä¸Š
       int scaledBefore = ( *before ) << log2UpsmpFactor;
       int scaledBehind = 0;
       while( pos <= upsmpFactor )
       {
-        // Í¨¹ı+-²Ù×÷¿ÉÒÔ¿ØÖÆ²åÖµÊ±²Î¿¼ÏñËØµÄÈ¨ÖØ
+        // é€šè¿‡+-æ“ä½œå¯ä»¥æ§åˆ¶æ’å€¼æ—¶å‚è€ƒåƒç´ çš„æƒé‡
         scaledBefore -= *before;
         scaledBehind += *behind;
         *currDst = (scaledBefore + scaledBehind + roundingOffset) >> log2UpsmpFactor;
@@ -262,8 +262,8 @@ void MatrixIntraPrediction::predictionUpsampling1D(int* const dst, const int* co
       }
 
       idxUpsmpDim++;
-      before = behind;//ÒÆ¶¯Ç°Ò»¸ö²Î¿¼ÏñËØ
-      behind += srcStep;//ÒÆ¶¯ºóÒ»¸ö²Î¿¼ÏñËØ
+      before = behind;//ç§»åŠ¨å‰ä¸€ä¸ªå‚è€ƒåƒç´ 
+      behind += srcStep;//ç§»åŠ¨åä¸€ä¸ªå‚è€ƒåƒç´ 
     }
 
     idxOrthDim++;
@@ -278,8 +278,8 @@ void MatrixIntraPrediction::predictionUpsampling( int* const dst, const int* con
 {
   const int* verSrc     = src;
   SizeType   verSrcStep = m_blockSize.width;
-  // ²åÖµ¹ı³Ì¹Ì¶¨£¬ÏÈË®Æ½ºó´¹Ö±
-  if( m_upsmpFactorHor > 1 ) // Èç¹ûĞèÒª²åÖµ
+  // æ’å€¼è¿‡ç¨‹å›ºå®šï¼Œå…ˆæ°´å¹³åå‚ç›´
+  if( m_upsmpFactorHor > 1 ) // å¦‚æœéœ€è¦æ’å€¼
   {
     int* const horDst = dst + (m_upsmpFactorVer - 1) * m_blockSize.width;
     verSrc = horDst;
@@ -318,7 +318,7 @@ void MatrixIntraPrediction::computeReducedPred( int*const result, const int* con
                                                 const uint8_t* matrix,
                                                 const bool transpose, const int bitDepth )
 {
-  // Êä³öµÄ³¤¶È 4»ò8
+  // è¾“å‡ºçš„é•¿åº¦ 4æˆ–8
   const int inputSize = 2 * m_reducedBdrySize;
 
   // use local buffer for transposed result
@@ -328,13 +328,13 @@ void MatrixIntraPrediction::computeReducedPred( int*const result, const int* con
 
   int sum = 0;
   for( int i = 0; i < inputSize; i++ ) { sum += input[i]; }
-  // MIP_SHIFT_MATRIX ÒÆÎ»Òò×ÓsW¹Ì¶¨Îª6
-  // MIP_OFFSET_MATRIX Æ«ÒÆÒò×ÓfO¹Ì¶¨Îª32
-  // ¼ÆËãÆ«ÒÆÁ¿Bias
+  // MIP_SHIFT_MATRIX ç§»ä½å› å­sWå›ºå®šä¸º6
+  // MIP_OFFSET_MATRIX åç§»å› å­fOå›ºå®šä¸º32
+  // è®¡ç®—åç§»é‡Bias
   const int offset = (1 << (MIP_SHIFT_MATRIX - 1)) - MIP_OFFSET_MATRIX * sum;
   CHECK( inputSize != 4 * (inputSize >> 2), "Error, input size not divisible by four" );
 
-  const uint8_t *weight = matrix;// È¨ÖØ¾ØÕó
+  const uint8_t *weight = matrix;// æƒé‡çŸ©é˜µ
   const int   inputOffset = transpose ? m_inputOffsetTransp : m_inputOffset;
 
   const bool redSize = (m_sizeId == 2);
@@ -355,7 +355,7 @@ void MatrixIntraPrediction::computeReducedPred( int*const result, const int* con
         tmp2 += input[i + 2] * weight[i + 2];
         tmp3 += input[i + 3] * weight[i + 3];
       }
-      // ¶Ô¾ØÕó³Ë·¨Êä³ö²ÉÑùÇ¯Î»
+      // å¯¹çŸ©é˜µä¹˜æ³•è¾“å‡ºé‡‡æ ·é’³ä½
       resPtr[posRes++] = ClipBD<int>(((tmp0 + tmp1 + tmp2 + tmp3 + offset) >> MIP_SHIFT_MATRIX) + inputOffset, bitDepth);
 
       weight += inputSize;
@@ -363,7 +363,7 @@ void MatrixIntraPrediction::computeReducedPred( int*const result, const int* con
   }
 
   if( transpose )
-  {// ½«¾ØÕó³Ë·¨½á¹û½øĞĞ×ªÖÃ
+  {// å°†çŸ©é˜µä¹˜æ³•ç»“æœè¿›è¡Œè½¬ç½®
     for( int y = 0; y < m_reducedPredSize; y++ )
     {
       for( int x = 0; x < m_reducedPredSize; x++ )

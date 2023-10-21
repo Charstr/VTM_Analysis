@@ -313,8 +313,8 @@ template <class BinProbModel>
 unsigned TBinDecoder<BinProbModel>::decodeBin( unsigned ctxId )
 {
   BinProbModel& rcProbModel = m_Ctx[ctxId];
-  unsigned      bin         = rcProbModel.mps(); // ×î¿ÉÄÜµÄ·ûºÅ
-  uint32_t      LPS         = rcProbModel.getLPS( m_Range ); // ×îĞ¡·ûºÅµÄ·¶Î§
+  unsigned      bin         = rcProbModel.mps(); // æœ€å¯èƒ½çš„ç¬¦å·
+  uint32_t      LPS         = rcProbModel.getLPS( m_Range ); // æœ€å°ç¬¦å·çš„èŒƒå›´
 
   DTRACE( g_trace_ctx, D_CABAC, "%d" " %d " "%d" "  " "[%d:%d]" "  " "%2d(MPS=%d)"  "  " , DTRACE_GET_COUNTER( g_trace_ctx, D_CABAC ), ctxId, m_Range, m_Range-LPS, LPS, ( unsigned int )( rcProbModel.state() ), m_Value < ( ( m_Range - LPS ) << 7 ) );
   //DTRACE( g_trace_ctx, D_CABAC, " %d " "%d" "  " "[%d:%d]" "  " "%2d(MPS=%d)"  "  ", DTRACE_GET_COUNTER( g_trace_ctx, D_CABAC ), m_Range, m_Range - LPS, LPS, (unsigned int)( rcProbModel.state() ), m_Value < ( ( m_Range - LPS ) << 7 ) );
